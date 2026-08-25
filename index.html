@@ -1,40 +1,857 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VerifyOnce — Government document verification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{--navy:#172d52;--blue:#2865ba;--teal:#077c6b;--green:#168052;--pale:#edf8f3;--cream:#f7f9fc;--ink:#182536;--muted:#647386;--line:#dce4ed;--shadow:0 12px 32px rgba(23,45,82,.10)}*{box-sizing:border-box}body{margin:0;background:var(--cream);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);line-height:1.45}.shell{max-width:1100px;margin:auto;padding:0 18px 38px}header{padding:17px 0;display:flex;justify-content:space-between;align-items:center;gap:9px}.brand{display:flex;gap:10px;align-items:center;font-size:21px;font-weight:850;color:var(--navy)}.mark{background:var(--blue);color:#fff;height:38px;width:38px;border-radius:12px;display:grid;place-items:center;font-size:21px}.trust,.lang{font-size:13px;font-weight:700;color:var(--teal);background:#e4f6f1;padding:7px 10px;border-radius:18px;border:0;cursor:pointer}.hero{background:linear-gradient(120deg,#172d52,#2865ba);border-radius:24px;color:#fff;padding:31px 28px;position:relative;overflow:hidden}.hero:after{content:'✓';position:absolute;right:4%;bottom:-56px;color:#fff;opacity:.11;font-size:220px;font-weight:900}.eyebrow{margin:0 0 7px;color:#c8e4ff;font-size:13px;letter-spacing:.09em;text-transform:uppercase;font-weight:800}.hero h1{margin:0;font-size:34px;line-height:1.13;max-width:620px}.hero p:last-child{max-width:580px;margin:12px 0 0;color:#e4efff;font-size:17px}.tabs{display:flex;gap:8px;margin:20px 0;overflow:auto;padding:2px}.tab{border:1px solid transparent;background:transparent;color:var(--muted);font-weight:800;padding:11px 15px;border-radius:12px;white-space:nowrap;cursor:pointer}.tab.active{background:#fff;color:var(--blue);border-color:var(--line);box-shadow:0 3px 10px #dfe6f0}.view{display:none}.view.active{display:block}.layout{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:23px;box-shadow:0 3px 14px rgba(23,45,82,.035)}h2{font-size:23px;margin:0 0 6px;color:var(--navy)}h3{margin:0;font-size:17px}.sub{margin:0 0 19px;color:var(--muted)}label{display:block;font-weight:750;font-size:15px;margin:0 0 7px}input{width:100%;padding:13px;border-radius:11px;border:1.5px solid #cdd9e6;min-height:50px;font:inherit;color:var(--ink)}input:focus{outline:3px solid #dceaff;border-color:var(--blue)}.field{margin-bottom:15px}.file{border:1.5px dashed #93b6d9;background:#f5faff;border-radius:13px;padding:15px;text-align:center;color:var(--blue);font-weight:800;cursor:pointer}.file input{display:none}.file small{display:block;color:var(--muted);font-weight:500;margin-top:4px}.primary{background:var(--blue);color:#fff;width:100%;padding:14px;border-radius:12px;font-weight:850;font-size:16px;border:0;cursor:pointer}.primary:hover{background:#1e55a3}.secondary{padding:10px 14px;border:1px solid #bcd1e9;background:#fff;color:var(--blue);border-radius:10px;font-weight:800;cursor:pointer}.portal-tag{display:inline-flex;align-items:center;gap:6px;margin-bottom:11px;padding:6px 10px;border-radius:16px;background:#e8f1ff;color:#245b9b;font-size:13px;font-weight:800}.how{display:grid;gap:14px}.how div{display:flex;gap:11px;align-items:flex-start}.number{background:#eaf3ff;color:var(--blue);height:29px;min-width:29px;border-radius:50%;display:grid;place-items:center;font-weight:850}.note{margin-top:20px;background:#fff7e6;border-radius:13px;padding:14px;font-size:14px;color:#6e5120}.note b{display:block}.loading{display:none;text-align:center;padding:23px;color:var(--navy);font-weight:750}.spinner{height:38px;width:38px;border-radius:50%;border:4px solid #d5e3f2;border-top-color:var(--blue);margin:0 auto 12px;animation:spin .85s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.success{display:none;background:var(--pale);border:1px solid #b8e0cc;border-radius:16px;padding:18px;margin-top:16px}.success .check{display:inline-grid;place-items:center;background:var(--green);height:31px;width:31px;border-radius:50%;color:#fff;font-weight:900;margin-right:8px}.success p{margin:8px 0 0;color:#38614c}.vault-card{border-left:5px solid var(--teal)}.vault-title{display:flex;align-items:center;gap:10px}.vault-title i{font-style:normal;background:#e4f6f1;color:var(--teal);padding:8px;border-radius:10px}.vault-stat{margin:15px 0;padding:14px;background:#f6fbfa;border-radius:13px}.vault-stat strong{font-size:24px;color:var(--teal);display:block}.vault-stat span{font-size:13px;color:var(--muted)}.sample{border:1px solid #b8e0cc;background:var(--pale);border-radius:15px;padding:16px;margin-bottom:17px}.sample strong{color:#17623f}.sample p{color:#37634e;margin:5px 0;font-size:14px}.sample button{margin-top:7px}.reuse{display:none;background:linear-gradient(115deg,#e8f8ef,#f5fffa);border:2px solid #81caa3;padding:23px;border-radius:18px;margin-top:18px}.reuse .big-check{font-size:36px}.reuse h2{color:#12623e;margin:3px 0}.reuse p{color:#3a654d;margin:7px 0 14px}.use-button{background:var(--green)}.fallback{display:none;margin-top:17px;border-top:1px solid var(--line);padding-top:18px}.appdone{display:none;margin-top:17px;background:#e8f8ef;color:#165a39;border-radius:14px;padding:16px}.consent-hero{background:#e6f6f2;border:1px solid #b7ded5;border-radius:18px;padding:19px;margin-bottom:18px}.consent-hero h2{color:#075e51}.consent-hero p{margin:6px 0 0;color:#386e64}.consent-row{display:grid;grid-template-columns:42px 1fr auto;gap:13px;align-items:center;border-bottom:1px solid var(--line);padding:16px 0}.consent-row:last-child{border:0}.consent-icon{height:38px;width:38px;border-radius:50%;background:#e5f6ef;color:var(--green);display:grid;place-items:center;font-weight:900}.consent-row p{margin:3px 0 0;font-size:14px;color:var(--muted)}.date{font-size:13px;color:var(--muted);text-align:right}.empty{padding:21px;color:var(--muted);text-align:center}.privacy{display:flex;gap:11px;background:#f4f8fd;padding:15px;border-radius:13px;color:#52657a;font-size:14px}.privacy b{display:block;color:var(--navy)}.otp,.choice{display:none;background:#f3f8ff;border-radius:12px;padding:13px;margin:0 0 15px}.choice .secondary{background:transparent;border:0;text-decoration:underline;padding:8px 0}.fetched{font-size:12px;color:#17623f;background:#e5f6ef;padding:4px 7px;border-radius:10px;margin-left:5px}.chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.chip{padding:5px 9px;border-radius:14px;background:#e5f6ef;color:#17623f;font-size:13px;font-weight:750}.modal{position:fixed;inset:0;background:#13284899;display:none;align-items:center;justify-content:center;padding:20px;z-index:9}.dialog{background:#fff;max-width:470px;border-radius:20px;padding:23px;box-shadow:var(--shadow)}.dialog h2{margin-top:8px}.dialog p{color:var(--muted)}.dialog-actions{display:flex;gap:10px;margin-top:18px}.dialog-actions button{width:auto;flex:1}.offline{background:#fff4dd;color:#765315;padding:10px 13px;border-radius:12px;margin-bottom:13px;display:none}.csc-banner{background:#eaf3ff;color:#274f84;padding:14px;border-radius:13px;margin-bottom:16px}.digilocker{margin-top:16px;background:#edf4ff;border:1px solid #bfdaff;border-radius:13px;padding:14px;color:#234d80}.digilocker b{display:block}@media(max-width:700px){.shell{padding:0 13px 28px}.hero{border-radius:18px;padding:25px 19px}.hero h1{font-size:28px}.layout{grid-template-columns:1fr}.card{padding:18px}.trust{display:none}.consent-row{grid-template-columns:38px 1fr}.date{grid-column:2;text-align:left}.hero p:last-child{font-size:16px}}
+    /* Variables & Reset */
+    :root {
+      --navy: #0f172a; --blue: #2563eb; --blue-hover: #1d4ed8; --teal: #0d9488;
+      --green: #16a34a; --pale: #f0fdf4; --cream: #f8fafc; --ink: #334155;
+      --muted: #64748b; --line: #e2e8f0; 
+      --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.01);
+      --shadow-hover: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--cream); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    
+    /* Animations */
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
+
+    /* Layout & Header */
+    .shell { max-width: 1100px; margin: auto; padding: 0 20px 40px; }
+    header { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; }
+    .brand { display: flex; gap: 12px; align-items: center; font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
+    .mark { background: var(--blue); color: #fff; height: 40px; width: 40px; border-radius: 12px; display: grid; place-items: center; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+    .mark svg { width: 24px; height: 24px; }
+    .lang { font-size: 14px; font-weight: 600; color: var(--teal); background: #ccfbf1; padding: 8px 14px; border-radius: 20px; border: 0; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .lang:hover { background: #99f6e4; }
+    
+    /* Hero */
+    .hero { background: linear-gradient(135deg, #1e3a8a, #2563eb); border-radius: 24px; color: #fff; padding: 40px; position: relative; overflow: hidden; box-shadow: var(--shadow); }
+    .hero svg.bg-icon { position: absolute; right: -2%; bottom: -40px; color: #fff; opacity: 0.1; width: 280px; height: 280px; }
+    .eyebrow { margin: 0 0 10px; color: #bfdbfe; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
+    .hero h1 { margin: 0; font-size: 38px; line-height: 1.15; max-width: 650px; font-weight: 800; letter-spacing: -0.02em; }
+    .hero p:last-child { max-width: 600px; margin: 16px 0 0; color: #dbeafe; font-size: 18px; line-height: 1.6; }
+    
+    /* Tabs */
+    .tabs { display: flex; gap: 10px; margin: 30px 0; overflow: auto; padding: 4px; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { border: 1px solid transparent; background: transparent; color: var(--muted); font-weight: 600; padding: 12px 18px; border-radius: 14px; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-size: 15px; }
+    .tab:hover { background: #f1f5f9; color: var(--navy); }
+    .tab.active { background: #fff; color: var(--blue); border-color: var(--line); box-shadow: 0 4px 10px rgba(0,0,0,0.03); font-weight: 700; }
+    .tab svg { width: 18px; height: 18px; opacity: 0.8; }
+    .tab.active svg { opacity: 1; }
+
+    .view { display: none; }
+    .view.active { display: block; animation: fadeIn 0.4s ease; }
+    
+    .layout { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 24px; }
+    
+    /* Cards */
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 32px; box-shadow: var(--shadow); transition: box-shadow 0.3s ease; position: relative; }
+    .card:hover { box-shadow: var(--shadow-hover); }
+    h2 { font-size: 24px; margin: 0 0 8px; color: var(--navy); font-weight: 800; letter-spacing: -0.01em; }
+    h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--navy); }
+    .sub { margin: 0 0 24px; color: var(--muted); font-size: 15px; line-height: 1.6; }
+    
+    /* Forms */
+    label { display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; margin: 0 0 8px; color: var(--navy); }
+    input { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid #cbd5e1; font: inherit; color: var(--navy); font-size: 16px; transition: all 0.2s; background: #f8fafc; }
+    input:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px #dbeafe; }
+    input.error { border-color: #ef4444; background: #fef2f2; }
+    input.error:focus { box-shadow: 0 0 0 4px #fee2e2; }
+    .error-msg { color: #ef4444; font-size: 13px; font-weight: 500; margin-top: 6px; display: none; }
+    .field { margin-bottom: 20px; position: relative; }
+    
+    .file { border: 2px dashed #cbd5e1; background: #f8fafc; border-radius: 16px; padding: 24px; text-align: center; color: var(--blue); font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+    .file:hover { border-color: var(--blue); background: #eff6ff; }
+    .file input { display: none; }
+    .file small { display: block; color: var(--muted); font-weight: 500; margin-top: 4px; font-size: 13px; }
+    .file svg { width: 28px; height: 28px; opacity: 0.7; }
+    
+    /* Buttons */
+    button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; font-family: inherit; }
+    .primary { background: var(--blue); color: #fff; width: 100%; padding: 16px; border-radius: 14px; font-weight: 700; font-size: 16px; border: 0; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+    .primary:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
+    .primary:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2); }
+    .secondary { padding: 14px 16px; border: 1.5px solid #cbd5e1; background: #fff; color: var(--ink); border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s; width: 100%; }
+    .secondary:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .back-btn { background: transparent; border: 0; color: var(--muted); font-weight: 600; font-size: 14px; padding: 8px 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; transition: all 0.2s; margin-left: -12px; }
+    .back-btn:hover { background: #f1f5f9; color: var(--navy); }
+    .back-btn svg { width: 16px; height: 16px; }
+
+    /* Tags */
+    .portal-tag { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 14px; border-radius: 20px; background: #eff6ff; color: #1e40af; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+    .portal-tag svg { width: 16px; height: 16px; }
+    
+    /* Progress */
+    .progress { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; font-size: 13px; font-weight: 600; color: var(--muted); }
+    .progress-bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--blue); width: 33%; transition: width 0.4s ease; border-radius: 3px; }
+
+    /* Step containers */
+    .step-container { display: none; animation: slideUp 0.3s ease; }
+    .step-container.active { display: block; }
+
+    /* Components */
+    .how { display: grid; gap: 16px; }
+    .how div { display: flex; gap: 14px; align-items: flex-start; }
+    .number { background: #eff6ff; color: var(--blue); height: 32px; min-width: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+    
+    .note { margin-top: 24px; background: #fef3c7; border-radius: 16px; padding: 20px; font-size: 14px; color: #92400e; line-height: 1.6; }
+    .note b { display: block; margin-bottom: 4px; color: #78350f; font-size: 15px; }
+    
+    .loading { display: none; text-align: center; padding: 40px 20px; color: var(--navy); font-weight: 600; font-size: 16px; }
+    .spinner { height: 44px; width: 44px; border-radius: 50%; border: 4px solid #e2e8f0; border-top-color: var(--blue); margin: 0 auto 16px; animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
+    
+    .success-box { display: none; background: var(--pale); border: 1.5px solid #86efac; border-radius: 16px; padding: 24px; margin-top: 20px; }
+    .success-header { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 8px; }
+    .success-box .check { display: grid; place-items: center; background: var(--green); height: 36px; width: 36px; border-radius: 50%; color: #fff; font-weight: 900; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .success-box .check svg { width: 20px; height: 20px; }
+    .success-box p { margin: 0; color: #15803d; line-height: 1.5; font-size: 15px; font-weight: 500; }
+    
+    .vault-card { border-left: 6px solid var(--teal); }
+    .vault-title { display: flex; align-items: center; gap: 12px; }
+    .vault-title i { font-style: normal; background: #ccfbf1; color: var(--teal); height: 44px; width: 44px; border-radius: 12px; display: grid; place-items: center; }
+    .vault-title i svg { width: 22px; height: 22px; }
+    .vault-stat { margin: 20px 0; padding: 18px; background: #f0fdfa; border-radius: 16px; border: 1px solid #ccfbf1; }
+    .vault-stat strong { font-size: 28px; color: var(--teal); display: block; line-height: 1; margin-bottom: 4px; font-weight: 800; }
+    .vault-stat span { font-size: 14px; color: #0f766e; font-weight: 500; }
+    
+    .sample { border: 1.5px solid #86efac; background: var(--pale); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+    .sample strong { color: #166534; font-size: 16px; display: block; margin-bottom: 8px;}
+    .sample p { color: #15803d; margin: 0 0 16px; font-size: 14px; }
+    .sample .secondary { border-color: #86efac; color: #166534; }
+    .sample .secondary:hover { background: #dcfce7; }
+    
+    .reuse { display: none; background: linear-gradient(135deg, #ecfdf5, #f0fdf4); border: 2px solid #34d399; padding: 32px; border-radius: 24px; margin-top: 24px; position: relative; overflow: hidden; animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reuse.celebrate { animation: pulseRing 1.5s infinite cubic-bezier(0.16, 1, 0.3, 1); }
+    .reuse .big-check { height: 56px; width: 56px; border-radius: 50%; background: var(--green); color: white; display: grid; place-items: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
+    .reuse .big-check svg { width: 32px; height: 32px; }
+    .reuse h2 { color: #064e3b; margin: 0 0 8px; }
+    .reuse p { color: #065f46; margin: 0 0 20px; font-size: 15px; font-weight: 500; }
+    .use-button { background: var(--green); box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2); }
+    .use-button:hover { background: #15803d; box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3); }
+    
+    .fallback { display: none; margin-top: 24px; border-top: 1px solid var(--line); padding-top: 24px; animation: fadeIn 0.3s ease; }
+    .appdone { display: none; margin-top: 24px; background: var(--pale); color: #166534; border: 1.5px solid #86efac; border-radius: 16px; padding: 24px; animation: popIn 0.4s ease; font-weight: 500;}
+    
+    .consent-hero { background: #f0fdfa; border: 1px solid #5eead4; border-radius: 20px; padding: 24px; margin-bottom: 24px; }
+    .consent-hero h2 { color: #0f766e; }
+    .consent-hero p { margin: 8px 0 0; color: #115e59; font-size: 15px; font-weight: 500; }
+    
+    .consent-row { display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center; border-bottom: 1px solid var(--line); padding: 20px 0; animation: slideUp 0.3s ease; }
+    .consent-row:last-child { border: 0; padding-bottom: 0; }
+    .consent-icon { height: 44px; width: 44px; border-radius: 50%; background: #dcfce7; color: var(--green); display: grid; place-items: center; }
+    .consent-icon svg { width: 22px; height: 22px; }
+    .consent-row p { margin: 4px 0 0; font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .consent-row b { color: var(--navy); font-size: 15px; }
+    .date { font-size: 13px; font-weight: 600; color: var(--muted); text-align: right; background: #f1f5f9; padding: 6px 10px; border-radius: 12px; }
+    
+    .empty { padding: 40px 20px; color: var(--muted); text-align: center; }
+    .empty svg { width: 48px; height: 48px; color: #cbd5e1; margin-bottom: 16px; }
+    
+    .privacy { display: flex; gap: 16px; background: #f8fafc; padding: 20px; border-radius: 16px; color: var(--ink); font-size: 14px; border: 1px solid var(--line); line-height: 1.6; }
+    .privacy svg { width: 20px; height: 20px; color: var(--navy); flex-shrink: 0; margin-top: 2px;}
+    .privacy b { display: block; color: var(--navy); margin-bottom: 4px; font-size: 15px; }
+    
+    .choice { text-align: center; background: #f8fafc; border: 1px solid var(--line); border-radius: 16px; padding: 32px 24px; margin: 0 0 20px; }
+    .choice p.sub { margin: 8px 0 24px; }
+    .choice .secondary { background: transparent; border: 0; text-decoration: underline; padding: 12px; margin-top: 12px; width: auto; color: var(--muted); }
+    .choice .secondary:hover { color: var(--navy); background: transparent; }
+    
+    .fetched { font-size: 12px; color: #166534; background: #dcfce7; padding: 4px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; animation: popIn 0.3s ease; }
+    .fetched svg { width: 12px; height: 12px; }
+    
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+    .chip { padding: 6px 12px; border-radius: 16px; background: #dcfce7; color: #166534; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .chip svg { width: 14px; height: 14px; }
+    
+    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 99; opacity: 0; transition: opacity 0.3s ease; }
+    .modal.show { opacity: 1; display: flex; }
+    .dialog { background: #fff; width: 100%; max-width: 480px; border-radius: 24px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .modal.show .dialog { transform: translateY(0); }
+    .dialog h2 { margin-top: 12px; }
+    .dialog p { color: var(--ink); line-height: 1.6; margin-bottom: 24px; font-size: 15px;}
+    .dialog-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .dialog-actions button { width: auto; flex: 1; }
+    
+    .offline-note { display: none; background: #fef3c7; color: #92400e; padding: 14px 16px; border-radius: 14px; margin-bottom: 24px; font-weight: 600; font-size: 14px; border: 1px solid #fde68a; align-items: center; gap: 10px; }
+    
+    .csc-banner { background: #eff6ff; color: #1e40af; padding: 20px; border-radius: 16px; margin-bottom: 24px; border: 1px solid #bfdbfe; line-height: 1.6; font-weight: 500; font-size: 15px;}
+    .digilocker { margin-top: 24px; background: #f8fafc; border: 1px solid var(--line); border-radius: 16px; padding: 20px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .digilocker b { display: flex; align-items: center; gap: 6px; color: var(--navy); margin-bottom: 6px; font-size: 15px; }
+    
+    /* Toast */
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--navy); color: #fff; padding: 14px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 100; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { background: #166534; }
+
+    /* Comparison Block */
+    .comp-block { border-radius: 16px; padding: 16px 20px; margin-bottom: 12px; border: 1px solid; line-height: 1.5;}
+    .comp-1 { background: #fef2f2; border-color: #fecaca; }
+    .comp-1 b { color: #b91c1c; display: block; margin-bottom: 4px; font-size: 15px;}
+    .comp-1 p { color: #991b1b; margin: 0; font-size: 14px;}
+    .comp-2 { background: #fef3c7; border-color: #fde68a; }
+    .comp-2 b { color: #b45309; display: block; margin-bottom: 4px; font-size: 15px;}
+    .comp-2 p { color: #92400e; margin: 0; font-size: 14px;}
+    .comp-3 { background: #f0fdf4; border-color: #bbf7d0; }
+    .comp-3 b { color: #15803d; display: block; margin-bottom: 4px; font-size: 15px;}
+    .comp-3 p { color: #166534; margin: 0; font-size: 14px;}
+    
+    @media(max-width: 700px) {
+      .shell { padding: 0 16px 32px; }
+      .hero { border-radius: 20px; padding: 32px 24px; }
+      .hero h1 { font-size: 32px; }
+      .layout { grid-template-columns: 1fr; }
+      .card { padding: 24px; }
+      .trust { display: none; }
+      .consent-row { grid-template-columns: 40px 1fr; gap: 12px; }
+      .date { grid-column: 2; text-align: left; display: inline-block; width: max-content; margin-top: 4px; }
+      .dialog-actions { flex-direction: column; }
+      .tab { padding: 12px; font-size: 14px; }
+    }
   </style>
 </head>
 <body>
  <main class="shell">
-  <header><div class="brand"><span class="mark">✓</span>VerifyOnce</div><div><button class="lang" id="offlineToggle">● Online</button> <button class="lang" id="langToggle">हिंदी</button></div></header>
-  <section class="hero"><p class="eyebrow">One identity, many services</p><h1>Verify once. Reuse everywhere.</h1><p>Government portals can use a citizen’s already verified documents — with their clear consent, not another upload.</p></section>
-  <nav class="tabs"><button class="tab active" data-view="ration">🍚 Ration Card Portal</button><button class="tab" data-view="scholarship">🎓 Scholarship Portal</button><button class="tab" data-view="consent">🛡️ My consent log</button><button class="tab" data-view="csc">🤝 CSC assisted mode</button></nav>
-  <section id="ration" class="view active"><div class="offline" id="offlineNote">Offline mode: this verification is saved on this phone and will sync when online.</div><div class="layout"><article class="card"><span class="portal-tag">🍚 Service portal · Ration Card</span><h2>Verify your identity</h2><p class="sub">Upload once. Your verified identity can be reused for other services when you approve it.</p><form id="rationForm"><div class="field"><label for="rPhone">Phone number</label><input id="rPhone" required inputmode="numeric" pattern="[0-9]{10}" placeholder="10-digit mobile number"></div><button class="secondary" type="button" id="sendOtp">Send OTP</button><div class="otp" id="otpBox"><label for="otp">Enter demo OTP</label><input id="otp" inputmode="numeric" placeholder="Enter 123456"><small>Demo OTP: 123456</small></div><div class="choice" id="fetchChoice"><b>Save time with your verified records</b><p class="sub" style="margin:5px 0 12px">Use DigiLocker to fill your details automatically.</p><button class="primary" type="button" id="fetchDigi">🔗 Fetch details from DigiLocker</button><button class="secondary" type="button" id="manualEntry">Enter manually instead</button></div><div id="nameFieldContainer" style="display:none"><div class="field"><label for="rName">Full name <span class="fetched" id="nameBadge" hidden>✓ Fetched from DigiLocker</span></label><input id="rName" required placeholder="e.g. Anjali Sharma"></div></div><div id="extraFields" style="display:none"><div class="field"><label for="dob">Date of birth <span class="fetched" id="dobBadge" hidden>✓ Fetched from DigiLocker</span></label><input id="dob" type="date"></div><div class="field"><label for="addressText">Address <span class="fetched" id="addressBadge" hidden>✓ Fetched from DigiLocker</span></label><input id="addressText" placeholder="Enter your address"></div></div><div id="manualUploads" style="display:none"><div class="field"><label class="file">🪪 Aadhaar document <input required id="aadhaar" type="file" accept="image/*,.pdf"><small id="aadhaarName">Upload a mock image or PDF</small></label></div><div class="field"><label class="file">🏠 Address proof <input required id="address" type="file" accept="image/*,.pdf"><small id="addressName">Upload a mock image or PDF</small></label></div></div><button class="primary" id="verifyBtn" style="display:none">Verify documents</button></form><div class="loading" id="verifying"><div class="spinner"></div>Checking documents securely…</div><div class="success" id="rationSuccess"><div><span class="check">✓</span><strong>Identity verified</strong></div><p>Verification is valid for 12 months. Other services must ask for your consent before using it.</p></div></article><aside class="card vault-card"><div class="vault-title"><i>🔐</i><div><h3>Shared verification vault</h3><span style="color:var(--muted);font-size:14px">Connected across government services</span></div></div><div class="vault-stat"><strong id="vaultCount">1</strong><span>verified identity record(s)</span></div><div class="how"><div><span class="number">1</span><span><b>This portal verifies</b><br><small>Documents are checked one time.</small></span></div><div><span class="number">2</span><span><b>Vault stores the proof</b><br><small>Not a copy for every portal.</small></span></div><div><span class="number">3</span><span><b>You give consent</b><br><small>Each reuse is visible in your log.</small></span></div></div><div class="digilocker"><b>🔗 DigiLocker-ready integration</b>In a production rollout, this vault would use DigiLocker/API Setu after approved partner onboarding. This demo simulates that secure consent handoff.</div><div class="note"><b>Demo shortcut</b>Switch to Scholarship Portal and enter <strong>9876543210</strong> to see a pre-verified citizen reuse their identity instantly.</div></aside></div></section>
-  <section id="scholarship" class="view"><div class="layout"><article class="card"><span class="portal-tag">🎓 Service portal · Scholarship</span><h2>Start scholarship application</h2><p class="sub">Check whether your identity is already verified through another service.</p><div class="sample"><strong>Try the reuse moment</strong><p>Pre-verified sample citizen: <b>Meera Patel · 9876543210</b></p><button class="secondary" id="trySample">Use sample number</button></div><div class="field"><label for="sPhone">Phone number</label><input id="sPhone" inputmode="numeric" placeholder="Enter 10-digit mobile number"></div><button class="primary" id="checkVault">Check verification</button><div class="reuse" id="reuseBanner"><div class="big-check">✓</div><h2>Already verified elsewhere</h2><p id="reuseText"></p><b>Only these facts will be shared:</b><div class="chips"><span class="chip">✓ Identity verified</span><span class="chip">✓ Address verified</span><span class="chip">✓ Validity date</span></div><small>Your Aadhaar number and uploaded files will not be shared.</small><button class="primary use-button" id="useIdentity" style="margin-top:14px">Review and use verified identity</button></div><div class="fallback" id="fallback"><h3>Identity not found in shared vault</h3><p class="sub" style="margin:6px 0 13px">Please upload your Aadhaar and address proof to continue.</p><label class="file">🪪 Upload Aadhaar <input type="file"><small>Mock upload for this demo</small></label><br><label class="file">🏠 Upload address proof <input type="file"><small>Mock upload for this demo</small></label></div><div class="appdone" id="appDone"><strong>✓ Documents verified</strong><br>Your scholarship application can now proceed to the next step.</div></article><aside class="card"><h2>Why this matters</h2><p class="sub">From repeated forms to one-tap services.</p><div style="border-radius:14px;background:#fff2f1;padding:15px;margin-bottom:10px"><b style="color:#a3453e">Before VerifyOnce</b><p style="margin:6px 0 0;color:#704a48">Type everything, upload files, then wait for verification — every single time.</p></div><div style="border-radius:14px;background:#fff7e6;padding:15px;margin-bottom:10px"><b style="color:#79520c">With DigiLocker fetch only</b><p style="margin:6px 0 0;color:#6d592f">No typing, but the same documents are still re-verified every time.</p></div><div style="border-radius:14px;background:#e8f8ef;padding:15px"><b style="color:#17623f">With VerifyOnce + DigiLocker</b><p style="margin:6px 0 0;color:#3a654d">No typing and no re-verification — one tap, done forever.</p></div><div class="privacy" style="margin-top:18px"><span>🛡️</span><span><b>You stay in control</b>The consent log shows exactly when a portal reused your verification.</span></div></aside></div></section>
-  <section id="consent" class="view"><div class="consent-hero"><h2>Your consent, clearly recorded</h2><p>Every time a service uses an existing verification, it appears here. You can see where it came from and when it was shared.</p></div><article class="card"><h2>Consent activity</h2><p class="sub">Identity reuse across connected government portals</p><div id="consentList"></div></article></section>
-  <section id="csc" class="view"><div class="layout"><article class="card"><span class="portal-tag">🤝 Assisted service · CSC operator</span><h2>Help a citizen reuse verification</h2><div class="csc-banner">The operator can guide the citizen, but the citizen must still approve sharing on their own device.</div><div class="field"><label for="cscPhone">Citizen phone number</label><input id="cscPhone" inputmode="numeric" placeholder="Enter 10-digit mobile number"></div><button class="primary" id="cscLookup">Find verified identity</button><div class="appdone" id="cscResult"></div></article><aside class="card"><h2>Works in low-connectivity areas</h2><p class="sub">Tap the Online button in the header to simulate a weak or unavailable network.</p><div class="privacy"><span>📶</span><span><b>Offline queue</b>Requests are saved locally, then automatically synchronised when the connection returns.</span></div></aside></div></section>
+  <header>
+    <div class="brand">
+      <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      VerifyOnce
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button class="lang" id="offlineToggle"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg> Online</button> 
+      <button class="lang" id="langToggle">हिंदी</button>
+    </div>
+  </header>
+  
+  <section class="hero">
+    <svg class="bg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <p class="eyebrow">One identity, many services</p>
+    <h1>Verify once. Reuse everywhere.</h1>
+    <p>Government portals can use a citizen’s already verified documents — with their clear consent, not another upload.</p>
+  </section>
+  
+  <nav class="tabs">
+    <button class="tab active" data-view="ration">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M5 12l-3 3 3 3"/></svg>
+      Ration Card Portal
+    </button>
+    <button class="tab" data-view="scholarship">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      Scholarship Portal
+    </button>
+    <button class="tab" data-view="consent">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      My consent log
+    </button>
+    <button class="tab" data-view="csc">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      CSC assisted mode
+    </button>
+  </nav>
+
+  <!-- PORTAL A: RATION CARD -->
+  <section id="ration" class="view active">
+    <div class="offline-note" id="offlineNote">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20"></path><path d="M8.53 8.53C5.52 10.33 3 13.53 3 17"></path><path d="M14 14c-1.63 0-3.03.65-4.05 1.7"></path><path d="M11 21A1 1 0 0 0 13 21"></path><path d="M20.25 14C21 14.88 21 15.9 21 17"></path><path d="M18.15 8.15C19.95 10.15 21 12.87 21 16"></path><path d="M4.64 4.64C7 2.45 10.22 1 13.88 1c4.87 0 9 2.58 11.45 6.45"></path></svg>
+      Offline mode: this verification is saved locally and will sync when online.
+    </div>
+    
+    <div class="layout">
+      <article class="card">
+        <span class="portal-tag">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="M5 12l-3 3 3 3"/></svg>
+          Service portal · Ration Card
+        </span>
+        <h2>Verify your identity</h2>
+        <p class="sub">Upload once. Your verified identity can be reused for other services when you approve it.</p>
+        
+        <div class="progress" id="rProgress">
+          <span id="stepLabel">Step 1 of 3: Phone number</span>
+          <div class="progress-bar"><div class="progress-fill" id="pBar"></div></div>
+        </div>
+
+        <form id="rationForm">
+          <!-- STEP 1: Phone -->
+          <div id="step1" class="step-container active">
+            <div class="field">
+              <label for="rPhone">Phone number</label>
+              <input id="rPhone" inputmode="numeric" placeholder="10-digit mobile number">
+              <div class="error-msg" id="phoneError">Please enter a valid 10-digit number</div>
+            </div>
+            <button class="primary" type="button" id="sendOtp">
+              Send OTP 
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </div>
+
+          <!-- STEP 2: OTP -->
+          <div id="step2" class="step-container">
+            <button class="back-btn" type="button" onclick="goToStep(1)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back
+            </button>
+            <div class="field">
+              <label for="otp">Enter OTP</label>
+              <input id="otp" inputmode="numeric" placeholder="Enter 123456">
+              <small style="color:var(--muted);display:block;margin-top:8px">Demo OTP: 123456</small>
+            </div>
+          </div>
+
+          <!-- STEP 3: Choice -->
+          <div id="step3" class="step-container">
+            <button class="back-btn" type="button" onclick="goToStep(1)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back
+            </button>
+            <div class="choice">
+              <h3 style="color:var(--navy);font-size:18px">Save time with your verified records</h3>
+              <p class="sub">Use DigiLocker to fill your details automatically.</p>
+              <button class="primary" type="button" id="fetchDigi">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                Fetch details from DigiLocker
+              </button>
+              <button class="secondary" type="button" id="manualEntry">Enter manually instead</button>
+            </div>
+          </div>
+
+          <!-- STEP 4: Manual or Fetched Data -->
+          <div id="step4" class="step-container">
+            <button class="back-btn" type="button" onclick="goToStep(3)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back
+            </button>
+            
+            <div class="field">
+              <label for="rName">
+                Full name 
+                <span class="fetched hidden" id="nameBadge">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Fetched from DigiLocker
+                </span>
+              </label>
+              <input id="rName" required placeholder="e.g. Anjali Sharma">
+            </div>
+            
+            <div id="extraFields" class="hidden">
+              <div class="field">
+                <label for="dob">
+                  Date of birth 
+                  <span class="fetched hidden" id="dobBadge">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Fetched from DigiLocker
+                  </span>
+                </label>
+                <input id="dob" type="date">
+              </div>
+              <div class="field">
+                <label for="addressText">
+                  Address 
+                  <span class="fetched hidden" id="addressBadge">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Fetched from DigiLocker
+                  </span>
+                </label>
+                <input id="addressText" placeholder="Enter your address">
+              </div>
+            </div>
+
+            <div id="manualUploads">
+              <div class="field">
+                <label class="file">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  Aadhaar document 
+                  <input required id="aadhaar" type="file" accept="image/*,.pdf">
+                  <small id="aadhaarName">Upload a mock image or PDF</small>
+                </label>
+              </div>
+              <div class="field">
+                <label class="file">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                  Address proof 
+                  <input required id="address" type="file" accept="image/*,.pdf">
+                  <small id="addressName">Upload a mock image or PDF</small>
+                </label>
+              </div>
+            </div>
+
+            <button class="primary" id="verifyBtn" type="submit">Verify documents</button>
+          </div>
+        </form>
+
+        <div class="loading" id="verifying">
+          <div class="spinner"></div>
+          <span id="loadMsg">Checking documents securely…</span>
+        </div>
+
+        <div class="success-box" id="rationSuccess">
+          <div class="success-header">
+            <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            Identity verified
+          </div>
+          <p>Verification is valid for 12 months. Other services must ask for your consent before using it.</p>
+        </div>
+      </article>
+
+      <aside class="card vault-card">
+        <div class="vault-title">
+          <i><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></i>
+          <div>
+            <h3>Shared verification vault</h3>
+            <span style="color:var(--muted);font-size:14px;font-weight:500;">Connected across government services</span>
+          </div>
+        </div>
+        <div class="vault-stat">
+          <strong id="vaultCount">1</strong>
+          <span>verified identity record(s)</span>
+        </div>
+        <div class="how">
+          <div>
+            <span class="number">1</span>
+            <span><b>This portal verifies</b><br><span style="color:var(--muted);font-size:14px">Documents are checked one time.</span></span>
+          </div>
+          <div>
+            <span class="number">2</span>
+            <span><b>Vault stores the proof</b><br><span style="color:var(--muted);font-size:14px">Not a copy for every portal.</span></span>
+          </div>
+          <div>
+            <span class="number">3</span>
+            <span><b>You give consent</b><br><span style="color:var(--muted);font-size:14px">Each reuse is visible in your log.</span></span>
+          </div>
+        </div>
+        <div class="digilocker">
+          <b><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> DigiLocker-ready integration</b>
+          In a production rollout, this vault would use DigiLocker/API Setu after approved partner onboarding. This demo simulates that secure consent handoff.
+        </div>
+        <div class="note">
+          <b>Demo shortcut</b>
+          Switch to Scholarship Portal and enter <strong>9876543210</strong> to see a pre-verified citizen reuse their identity instantly.
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- PORTAL B: SCHOLARSHIP -->
+  <section id="scholarship" class="view">
+    <div class="layout">
+      <article class="card">
+        <span class="portal-tag">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          Service portal · Scholarship
+        </span>
+        <h2>Start scholarship application</h2>
+        <p class="sub">Check whether your identity is already verified through another service.</p>
+        
+        <div class="sample">
+          <strong>Try the reuse moment</strong>
+          <p>Pre-verified sample citizen: <b style="color:var(--navy)">Meera Patel · 9876543210</b></p>
+          <button class="secondary" id="trySample" style="width:auto">Use sample number</button>
+        </div>
+        
+        <div class="field">
+          <label for="sPhone">Phone number</label>
+          <input id="sPhone" inputmode="numeric" placeholder="Enter 10-digit mobile number">
+        </div>
+        <button class="primary" id="checkVault">Check verification</button>
+        
+        <div class="reuse" id="reuseBanner">
+          <div class="big-check">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <h2>Already verified elsewhere</h2>
+          <p id="reuseText"></p>
+          <b style="color:#064e3b;font-size:14px">Only these facts will be shared:</b>
+          <div class="chips">
+            <span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Identity verified</span>
+            <span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Address verified</span>
+            <span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Validity date</span>
+          </div>
+          <small style="display:block;margin-bottom:16px;color:#059669;font-weight:500;">Your Aadhaar number and uploaded files will not be shared.</small>
+          <button class="primary use-button" id="useIdentity">Review and use verified identity</button>
+        </div>
+        
+        <div class="fallback" id="fallback">
+          <h3>Identity not found in shared vault</h3>
+          <p class="sub" style="margin:6px 0 20px">Please upload your Aadhaar and address proof to continue.</p>
+          <div class="field">
+            <label class="file">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              Upload Aadhaar <input type="file"><small>Mock upload for this demo</small>
+            </label>
+          </div>
+          <div class="field">
+            <label class="file">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+              Upload address proof <input type="file"><small>Mock upload for this demo</small>
+            </label>
+          </div>
+        </div>
+        
+        <div class="appdone" id="appDone">
+          <span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;">
+            <svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Documents verified
+          </span>
+          Your scholarship application can now proceed to the next step.
+        </div>
+      </article>
+
+      <aside class="card">
+        <h2>Why this matters</h2>
+        <p class="sub">From repeated forms to one-tap services.</p>
+        
+        <div class="comp-block comp-1">
+          <b>Before VerifyOnce</b>
+          <p>Type everything, upload files, then wait for verification — every single time.</p>
+        </div>
+        <div class="comp-block comp-2">
+          <b>With DigiLocker fetch only</b>
+          <p>No typing, but the same documents are still re-verified every time.</p>
+        </div>
+        <div class="comp-block comp-3">
+          <b>With VerifyOnce + DigiLocker</b>
+          <p>No typing and no re-verification — one tap, done forever.</p>
+        </div>
+        
+        <div class="privacy" style="margin-top:24px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div>
+            <b>You stay in control</b>
+            <span style="color:var(--muted)">The consent log shows exactly when a portal reused your verification.</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CONSENT LOG -->
+  <section id="consent" class="view">
+    <div class="consent-hero">
+      <h2>Your consent, clearly recorded</h2>
+      <p>Every time a service uses an existing verification, it appears here. You can see where it came from and when it was shared.</p>
+    </div>
+    <article class="card">
+      <h2>Consent activity</h2>
+      <p class="sub">Identity reuse across connected government portals</p>
+      <div id="consentList"></div>
+    </article>
+  </section>
+
+  <!-- CSC MODE -->
+  <section id="csc" class="view">
+    <div class="layout">
+      <article class="card">
+        <span class="portal-tag">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Assisted service · CSC operator
+        </span>
+        <h2>Help a citizen reuse verification</h2>
+        <div class="csc-banner">The operator can guide the citizen, but the citizen must still approve sharing on their own device.</div>
+        <div class="field">
+          <label for="cscPhone">Citizen phone number</label>
+          <input id="cscPhone" inputmode="numeric" placeholder="Enter 10-digit mobile number">
+        </div>
+        <button class="primary" id="cscLookup">Find verified identity</button>
+        <div class="appdone" id="cscResult" style="margin-top:20px;"></div>
+      </article>
+      <aside class="card">
+        <h2>Works in low-connectivity areas</h2>
+        <p class="sub">Tap the Online button in the header to simulate a weak or unavailable network.</p>
+        <div class="privacy">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+          <div>
+            <b>Offline queue</b>
+            <span style="color:var(--muted)">Requests are saved locally, then automatically synchronised when the connection returns.</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
  </main>
- <div class="modal" id="consentModal"><div class="dialog"><span class="portal-tag">Consent request</span><h2>Allow Scholarship Portal?</h2><p>It will receive only: identity verified, address verified, and verification validity. It will not receive your Aadhaar number or document files.</p><div class="dialog-actions"><button class="secondary" id="denyConsent">Don’t allow</button><button class="primary use-button" id="allowConsent">Allow once</button></div></div></div><div class="modal" id="digiModal"><div class="dialog"><span class="portal-tag">🔗 DigiLocker consent</span><h2>Allow VerifyOnce to fetch details?</h2><p>VerifyOnce wants to fetch: <b>Name, DOB, Address, and Aadhaar verification status</b> from DigiLocker.</p><div class="dialog-actions"><button class="secondary" id="denyDigi">Deny</button><button class="primary" id="allowDigi">Allow</button></div></div></div>
+
+ <!-- MODALS -->
+ <div class="modal" id="consentModal">
+  <div class="dialog">
+    <span class="portal-tag">Consent request</span>
+    <h2>Allow Scholarship Portal?</h2>
+    <p>It will receive only: identity verified, address verified, and verification validity. It will not receive your Aadhaar number or document files.</p>
+    <div class="dialog-actions">
+      <button class="secondary" id="denyConsent">Don’t allow</button>
+      <button class="primary use-button" id="allowConsent">Allow once</button>
+    </div>
+  </div>
+ </div>
+
+ <div class="modal" id="digiModal">
+  <div class="dialog">
+    <span class="portal-tag">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+      DigiLocker consent
+    </span>
+    <h2>Allow VerifyOnce to fetch details?</h2>
+    <p>VerifyOnce wants to fetch: <b style="color:var(--navy)">Name, DOB, Address, and Aadhaar verification status</b> from DigiLocker.</p>
+    <div class="dialog-actions">
+      <button class="secondary" id="denyDigi">Deny</button>
+      <button class="primary" id="allowDigi">Allow</button>
+    </div>
+  </div>
+ </div>
+
+ <!-- TOAST -->
+ <div id="toast">
+   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+   <span id="toastMsg">Success</span>
+ </div>
+
  <script>
- const seed={name:'Meera Patel',phone:'9876543210',verifiedAt:'24 Aug 2026, 10:30 AM',validUntil:'24 Aug 2027',verifiedBy:'Ration Card Portal',documents:['Aadhaar','Address proof']};
- let vault=JSON.parse(localStorage.getItem('verifyOnceVault')||'null')||[seed]; let consentLog=JSON.parse(localStorage.getItem('verifyOnceConsent')||'null')||[];
- const persist=()=>{localStorage.setItem('verifyOnceVault',JSON.stringify(vault));localStorage.setItem('verifyOnceConsent',JSON.stringify(consentLog));document.getElementById('vaultCount').textContent=vault.length}; const byId=id=>document.getElementById(id); const now=()=>new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
- document.querySelectorAll('.tab').forEach(tab=>tab.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(x=>x.classList.remove('active'));tab.classList.add('active');byId(tab.dataset.view).classList.add('active');if(tab.dataset.view==='consent')renderConsent()});
- [['aadhaar','aadhaarName'],['address','addressName']].forEach(([input,text])=>byId(input).onchange=e=>byId(text).textContent=e.target.files[0]?.name||'Upload a mock image or PDF');
- byId('sendOtp').onclick=()=>{byId('otpBox').style.display='block';byId('sendOtp').textContent='OTP sent ✓'};byId('otp').oninput=()=>{if(byId('otp').value==='123456')byId('fetchChoice').style.display='block'};
- byId('fetchDigi').onclick=()=>byId('digiModal').style.display='flex';byId('denyDigi').onclick=()=>{byId('digiModal').style.display='none';byId('manualEntry').click()};byId('manualEntry').onclick=()=>{byId('fetchChoice').style.display='none';byId('nameFieldContainer').style.display='block';byId('manualUploads').style.display='block';byId('verifyBtn').style.display='block';byId('aadhaar').required=true;byId('address').required=true};
- byId('allowDigi').onclick=()=>{byId('digiModal').style.display='none';byId('fetchChoice').style.display='none';byId('rationForm').style.display='none';byId('verifying').style.display='block';byId('verifying').lastChild.textContent=' Fetching from DigiLocker…';setTimeout(()=>{byId('rName').value='Anjali Sharma';byId('dob').value='1996-04-18';byId('addressText').value='12, Shanti Nagar, Pune, Maharashtra';['nameBadge','dobBadge','addressBadge'].forEach(id=>byId(id).hidden=false);byId('manualUploads').style.display='none';byId('nameFieldContainer').style.display='block';byId('extraFields').style.display='block';byId('verifyBtn').style.display='block';byId('aadhaar').required=false;byId('address').required=false;byId('verifying').style.display='none';byId('rationForm').style.display='block'},2000)};
- byId('rationForm').onsubmit=e=>{e.preventDefault();if(byId('otpBox').style.display!=='block'||byId('otp').value!=='123456'){alert('Please verify your mobile with demo OTP 123456.');return}byId('rationForm').style.display='none';byId('verifying').style.display='block';setTimeout(()=>{const phone=byId('rPhone').value.trim();vault=vault.filter(v=>v.phone!==phone);vault.push({name:byId('rName').value.trim(),phone,verifiedAt:now(),validUntil:'25 Aug 2027',verifiedBy:'Ration Card Portal',documents:['Aadhaar','Address proof']});persist();byId('verifying').style.display='none';byId('rationSuccess').style.display='block'},2500)};
- byId('trySample').onclick=()=>{byId('sPhone').value=seed.phone;checkVault()};byId('checkVault').onclick=checkVault;
- function checkVault(){const phone=byId('sPhone').value.trim(),person=vault.find(v=>v.phone===phone);byId('reuseBanner').style.display='none';byId('fallback').style.display='none';byId('appDone').style.display='none';if(!phone){byId('sPhone').focus();return}if(person){byId('reuseText').textContent=`${person.name}'s identity was verified via ${person.verifiedBy} on ${person.verifiedAt}. Valid until ${person.validUntil||'24 Aug 2027'}.`;byId('reuseBanner').style.display='block';byId('useIdentity').dataset.phone=phone}else byId('fallback').style.display='block'}
- byId('useIdentity').onclick=()=>byId('consentModal').style.display='flex';byId('denyConsent').onclick=()=>byId('consentModal').style.display='none';byId('allowConsent').onclick=()=>{const phone=byId('useIdentity').dataset.phone,person=vault.find(v=>v.phone===phone);consentLog.unshift({name:person.name,phone,usedBy:'Scholarship Portal',source:person.verifiedBy,date:now(),scope:'Identity verified, address verified, validity date'});persist();byId('consentModal').style.display='none';byId('reuseBanner').style.display='none';byId('appDone').style.display='block'};
- function renderConsent(){const node=byId('consentList');node.innerHTML=consentLog.length?consentLog.map(x=>`<div class="consent-row"><div class="consent-icon">✓</div><div><b>Your identity was shared with ${x.usedBy}</b><p>Using verification from ${x.source} · ${x.scope||'Verified identity'} · ${x.name} (${x.phone})</p></div><span class="date">${x.date}</span></div>`).join(''):`<div class="empty"><div style="font-size:34px">🛡️</div><p>No identity reuse yet. When you approve a portal to use your verified identity, it will appear here.</p></div>`}
- let offline=false;byId('offlineToggle').onclick=()=>{offline=!offline;byId('offlineToggle').textContent=offline?'◌ Offline':'● Online';byId('offlineToggle').style.color=offline?'#765315':'';byId('offlineNote').style.display=offline?'block':'none'};byId('cscLookup').onclick=()=>{const p=vault.find(x=>x.phone===byId('cscPhone').value.trim());const n=byId('cscResult');n.style.display='block';n.innerHTML=p?`<strong>✓ ${p.name} is verified</strong><br>Valid until ${p.validUntil||'24 Aug 2027'}. Ask the citizen to approve sharing on their phone.`:'No verified identity found. Help the citizen complete the Ration Card verification.'};byId('langToggle').onclick=()=>{const hi=byId('langToggle').textContent==='हिंदी';byId('langToggle').textContent=hi?'English':'हिंदी';document.querySelector('.hero h1').textContent=hi?'एक बार सत्यापित करें। हर जगह उपयोग करें।':'Verify once. Reuse everywhere.';document.querySelector('.hero p:last-child').textContent=hi?'सरकारी सेवाएं आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकती हैं।':'Government portals can use a citizen’s already verified documents — with their clear consent, not another upload.'};
- persist();renderConsent();
+  // Setup & Utils
+  const seed = {name:'Meera Patel', phone:'9876543210', verifiedAt: Date.now() - 86400000 * 2, validUntil:'24 Aug 2027', verifiedBy:'Ration Card Portal', documents:['Aadhaar','Address proof']};
+  let vault = JSON.parse(localStorage.getItem('verifyOnceVault')||'null') || [seed]; 
+  let consentLog = JSON.parse(localStorage.getItem('verifyOnceConsent')||'null') || [];
+  
+  const byId = id => document.getElementById(id);
+  const persist = () => { localStorage.setItem('verifyOnceVault', JSON.stringify(vault)); localStorage.setItem('verifyOnceConsent', JSON.stringify(consentLog)); byId('vaultCount').textContent = vault.length; };
+  const showToast = (msg, isSuccess=true) => { const t = byId('toast'); byId('toastMsg').textContent = msg; t.className = isSuccess?'success show':'show'; setTimeout(()=>t.className='', 3000); };
+  
+  // Format dates elegantly
+  const formatTime = (ts) => {
+    const diff = Math.floor((Date.now() - ts) / 60000); // mins
+    if(diff < 1) return 'Just now';
+    if(diff < 60) return `${diff} min${diff>1?'s':''} ago`;
+    if(diff < 1440) { const h = Math.floor(diff/60); return `${h} hr${h>1?'s':''} ago`; }
+    return new Date(ts).toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'});
+  };
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab => tab.onclick = () => {
+    document.querySelectorAll('.tab, .view').forEach(x => x.classList.remove('active'));
+    tab.classList.add('active');
+    byId(tab.dataset.view).classList.add('active');
+    if(tab.dataset.view === 'consent') renderConsent();
+  });
+
+  // File Inputs
+  [['aadhaar','aadhaarName'],['address','addressName']].forEach(([input,text]) => {
+    byId(input).onchange = e => byId(text).textContent = e.target.files[0]?.name || 'Upload a mock image or PDF';
+  });
+
+  // Flow logic (Portal A)
+  let currentStep = 1;
+  const goToStep = (step) => {
+    document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+    byId(`step${step}`).classList.add('active');
+    currentStep = step;
+    const pBar = byId('pBar');
+    const label = byId('stepLabel');
+    if(step===1) { pBar.style.width = '33%'; label.textContent = 'Step 1 of 3: Phone number'; }
+    if(step===2) { pBar.style.width = '66%'; label.textContent = 'Step 2 of 3: Verify OTP'; }
+    if(step===3) { pBar.style.width = '80%'; label.textContent = 'Step 3 of 3: Verification method'; }
+    if(step===4) { pBar.style.width = '100%'; label.textContent = 'Step 3 of 3: Complete verification'; }
+  };
+
+  byId('sendOtp').onclick = () => {
+    const phone = byId('rPhone').value.trim();
+    if(!/^\d{10}$/.test(phone)) {
+      byId('rPhone').classList.add('error');
+      byId('phoneError').style.display = 'block';
+      return;
+    }
+    byId('rPhone').classList.remove('error');
+    byId('phoneError').style.display = 'none';
+    goToStep(2);
+    showToast('OTP sent successfully');
+  };
+
+  byId('otp').oninput = () => { if(byId('otp').value === '123456') goToStep(3); };
+
+  byId('fetchDigi').onclick = () => {
+    byId('digiModal').classList.add('show');
+  };
+  
+  byId('denyDigi').onclick = () => {
+    byId('digiModal').classList.remove('show');
+    byId('manualEntry').click();
+  };
+  
+  byId('manualEntry').onclick = () => {
+    goToStep(4);
+    byId('extraFields').classList.add('hidden');
+    byId('manualUploads').classList.remove('hidden');
+    byId('aadhaar').required = true;
+    byId('address').required = true;
+    
+    // Clear fetched data if any
+    byId('rName').value = '';
+    ['nameBadge','dobBadge','addressBadge'].forEach(id => byId(id).classList.add('hidden'));
+  };
+
+  byId('allowDigi').onclick = () => {
+    byId('digiModal').classList.remove('show');
+    byId('rationForm').classList.add('hidden');
+    byId('rProgress').classList.add('hidden');
+    
+    const ver = byId('verifying');
+    ver.style.display = 'block';
+    byId('loadMsg').textContent = ' Fetching from DigiLocker…';
+    
+    setTimeout(() => {
+      goToStep(4);
+      byId('rName').value = 'Anjali Sharma';
+      byId('dob').value = '1996-04-18';
+      byId('addressText').value = '12, Shanti Nagar, Pune, Maharashtra';
+      
+      ['nameBadge','dobBadge','addressBadge'].forEach(id => byId(id).classList.remove('hidden'));
+      byId('manualUploads').classList.add('hidden');
+      byId('extraFields').classList.remove('hidden');
+      
+      byId('aadhaar').required = false;
+      byId('address').required = false;
+      
+      ver.style.display = 'none';
+      byId('rationForm').classList.remove('hidden');
+      byId('rProgress').classList.remove('hidden');
+      
+      showToast('Details fetched securely');
+    }, 2000);
+  };
+
+  // Submit Portal A
+  byId('rationForm').onsubmit = e => {
+    e.preventDefault();
+    byId('rationForm').classList.add('hidden');
+    byId('rProgress').classList.add('hidden');
+    
+    const ver = byId('verifying');
+    ver.style.display = 'block';
+    byId('loadMsg').textContent = ' Checking documents securely…';
+    
+    setTimeout(() => {
+      const phone = byId('rPhone').value.trim();
+      vault = vault.filter(v => v.phone !== phone);
+      vault.push({
+        name: byId('rName').value.trim(),
+        phone,
+        verifiedAt: Date.now(),
+        validUntil: '25 Aug 2027',
+        verifiedBy: 'Ration Card Portal',
+        documents: ['Aadhaar', 'Address proof']
+      });
+      persist();
+      ver.style.display = 'none';
+      byId('rationSuccess').style.display = 'block';
+      showToast('Identity verified and saved to vault');
+    }, 2000);
+  };
+
+  // Portal B
+  byId('trySample').onclick = () => { byId('sPhone').value = seed.phone; checkVault(); };
+  byId('checkVault').onclick = checkVault;
+  
+  function checkVault() {
+    const phone = byId('sPhone').value.trim();
+    const person = vault.find(v => v.phone === phone);
+    
+    byId('reuseBanner').style.display = 'none';
+    byId('fallback').style.display = 'none';
+    byId('appDone').style.display = 'none';
+    
+    if(!phone) { byId('sPhone').focus(); return; }
+    
+    if(person) {
+      byId('reuseText').innerHTML = `<b style="color:var(--navy)">${person.name}'s</b> identity was verified via <b>${person.verifiedBy}</b> on ${new Date(person.verifiedAt).toLocaleDateString('en-IN')}. Valid until ${person.validUntil || '24 Aug 2027'}.`;
+      
+      const banner = byId('reuseBanner');
+      banner.style.display = 'block';
+      banner.classList.remove('celebrate');
+      // Trigger reflow for animation
+      void banner.offsetWidth; 
+      banner.classList.add('celebrate');
+      
+      byId('useIdentity').dataset.phone = phone;
+    } else {
+      byId('fallback').style.display = 'block';
+    }
+  }
+
+  byId('useIdentity').onclick = () => byId('consentModal').classList.add('show');
+  byId('denyConsent').onclick = () => byId('consentModal').classList.remove('show');
+  
+  byId('allowConsent').onclick = () => {
+    const phone = byId('useIdentity').dataset.phone;
+    const person = vault.find(v => v.phone === phone);
+    
+    consentLog.unshift({
+      name: person.name, phone, usedBy: 'Scholarship Portal', 
+      source: person.verifiedBy, date: Date.now(), 
+      scope: 'Identity verified, address verified, validity date'
+    });
+    persist();
+    
+    byId('consentModal').classList.remove('show');
+    byId('reuseBanner').style.display = 'none';
+    byId('appDone').style.display = 'block';
+    showToast('Consent granted for reuse');
+  };
+
+  // Consent Log
+  function renderConsent() {
+    const node = byId('consentList');
+    node.innerHTML = consentLog.length ? consentLog.map(x => `
+      <div class="consent-row">
+        <div class="consent-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+        <div>
+          <b>Your identity was shared with ${x.usedBy}</b>
+          <p>Using verification from ${x.source} · ${x.scope || 'Verified identity'} · ${x.name} (${x.phone})</p>
+        </div>
+        <span class="date">${formatTime(x.date)}</span>
+      </div>
+    `).join('') : `
+      <div class="empty">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p style="font-size:16px;font-weight:500;color:var(--navy)">No identity reuse yet.</p>
+        <p>When you approve a portal to use your verified identity, it will appear here.</p>
+      </div>
+    `;
+  }
+
+  // Misc
+  let offline = false;
+  byId('offlineToggle').onclick = () => {
+    offline = !offline;
+    byId('offlineToggle').innerHTML = offline ? 
+      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg> Offline' : 
+      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg> Online';
+    byId('offlineToggle').style.color = offline ? '#92400e' : '';
+    byId('offlineToggle').style.background = offline ? '#fde68a' : '';
+    byId('offlineNote').style.display = offline ? 'flex' : 'none';
+  };
+  
+  byId('cscLookup').onclick = () => {
+    const p = vault.find(x => x.phone === byId('cscPhone').value.trim());
+    const n = byId('cscResult');
+    n.style.display = 'block';
+    n.innerHTML = p ? 
+      `<span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;"><svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${p.name} is verified</span>Valid until ${p.validUntil || '24 Aug 2027'}. Ask the citizen to approve sharing on their phone.` : 
+      'No verified identity found. Help the citizen complete the Ration Card verification.';
+  };
+  
+  byId('langToggle').onclick = () => {
+    const hi = byId('langToggle').textContent === 'हिंदी';
+    byId('langToggle').textContent = hi ? 'English' : 'हिंदी';
+    document.querySelector('.hero h1').textContent = hi ? 'एक बार सत्यापित करें। हर जगह उपयोग करें।' : 'Verify once. Reuse everywhere.';
+    document.querySelector('.hero p:last-child').textContent = hi ? 'सरकारी सेवाएं आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकती हैं।' : 'Government portals can use a citizen’s already verified documents — with their clear consent, not another upload.';
+  };
+
+  // Init
+  persist();
+  renderConsent();
  </script>
 </body>
 </html>
