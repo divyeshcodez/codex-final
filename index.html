@@ -371,6 +371,39 @@
                 </label>
                 <input id="addressText" placeholder="Enter your address">
               </div>
+              
+              <div class="field" style="margin-top: 24px;">
+                <label>
+                  Official Documents 
+                  <span class="fetched" id="docsBadge">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Fetched from DigiLocker
+                  </span>
+                </label>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+                  <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" color="#2563eb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <div>
+                      <b style="font-size:14px; color:var(--navy); display:block; line-height:1.2;">Aadhaar Card</b>
+                      <span style="font-size:12px; color:var(--muted);">UIDAI</span>
+                    </div>
+                  </div>
+                  <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" color="#2563eb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <div>
+                      <b style="font-size:14px; color:var(--navy); display:block; line-height:1.2;">PAN Record</b>
+                      <span style="font-size:12px; color:var(--muted);">Income Tax Dept</span>
+                    </div>
+                  </div>
+                  <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" color="#2563eb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="14.5" r="2.5"></circle><path d="M16 11v6"></path><path d="M19 11v6"></path></svg>
+                    <div>
+                      <b style="font-size:14px; color:var(--navy); display:block; line-height:1.2;">Driving License</b>
+                      <span style="font-size:12px; color:var(--muted);">MoRTH</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div id="manualUploads">
@@ -606,7 +639,7 @@
       DigiLocker consent
     </span>
     <h2>Allow VerifyOnce to fetch details?</h2>
-    <p>VerifyOnce wants to fetch: <b style="color:var(--navy)">Name, DOB, Address, and Aadhaar Card</b> from DigiLocker.</p>
+    <p>VerifyOnce wants to fetch: <b style="color:var(--navy)">Identity details (Name, DOB, Address) and Official Documents (Aadhaar Card, PAN Card, Driving License)</b> from DigiLocker.</p>
     <div class="dialog-actions">
       <button class="secondary" id="denyDigi">Deny</button>
       <button class="primary" id="allowDigi">Allow</button>
@@ -747,6 +780,9 @@
     
     setTimeout(() => {
       const phone = byId('rPhone').value.trim();
+      const isDigilocker = !byId('extraFields').classList.contains('hidden');
+      const docs = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
+      
       vault = vault.filter(v => v.phone !== phone);
       vault.push({
         name: byId('rName').value.trim(),
@@ -754,7 +790,7 @@
         verifiedAt: Date.now(),
         validUntil: '25 Aug 2027',
         verifiedBy: 'Ration Card Portal',
-        documents: ['Aadhaar', 'Address proof']
+        documents: docs
       });
       persist();
       ver.style.display = 'none';
