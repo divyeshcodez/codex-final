@@ -342,6 +342,16 @@
             
             <div id="extraFields" class="hidden">
               <div class="field">
+                <label for="aadhaarNum">
+                  Aadhaar Number 
+                  <span class="fetched hidden" id="aadhaarNumBadge">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Fetched from DigiLocker
+                  </span>
+                </label>
+                <input id="aadhaarNum" placeholder="e.g. 1234 5678 9012">
+              </div>
+              <div class="field">
                 <label for="dob">
                   Date of birth 
                   <span class="fetched hidden" id="dobBadge">
@@ -596,7 +606,7 @@
       DigiLocker consent
     </span>
     <h2>Allow VerifyOnce to fetch details?</h2>
-    <p>VerifyOnce wants to fetch: <b style="color:var(--navy)">Name, DOB, Address, and Aadhaar verification status</b> from DigiLocker.</p>
+    <p>VerifyOnce wants to fetch: <b style="color:var(--navy)">Name, DOB, Address, and Aadhaar Card</b> from DigiLocker.</p>
     <div class="dialog-actions">
       <button class="secondary" id="denyDigi">Deny</button>
       <button class="primary" id="allowDigi">Allow</button>
@@ -689,7 +699,9 @@
     
     // Clear fetched data if any
     byId('rName').value = '';
+    if(byId('aadhaarNum')) byId('aadhaarNum').value = '';
     ['nameBadge','dobBadge','addressBadge'].forEach(id => byId(id).classList.add('hidden'));
+    if(byId('aadhaarNumBadge')) byId('aadhaarNumBadge').classList.add('hidden');
   };
 
   byId('allowDigi').onclick = () => {
@@ -704,10 +716,11 @@
     setTimeout(() => {
       goToStep(4);
       byId('rName').value = 'Anjali Sharma';
+      byId('aadhaarNum').value = 'XXXX XXXX 8912';
       byId('dob').value = '1996-04-18';
       byId('addressText').value = '12, Shanti Nagar, Pune, Maharashtra';
       
-      ['nameBadge','dobBadge','addressBadge'].forEach(id => byId(id).classList.remove('hidden'));
+      ['nameBadge','aadhaarNumBadge','dobBadge','addressBadge'].forEach(id => byId(id).classList.remove('hidden'));
       byId('manualUploads').classList.add('hidden');
       byId('extraFields').classList.remove('hidden');
       
