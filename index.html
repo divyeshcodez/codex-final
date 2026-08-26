@@ -39,7 +39,12 @@
     .hero svg.bg-icon { position: absolute; right: -2%; bottom: -40px; color: #fff; opacity: 0.1; width: 280px; height: 280px; }
     .eyebrow { margin: 0 0 10px; color: #bfdbfe; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
     .hero h1 { margin: 0; font-size: 38px; line-height: 1.15; max-width: 650px; font-weight: 800; letter-spacing: -0.02em; }
-    .hero p:last-child { max-width: 600px; margin: 16px 0 0; color: #dbeafe; font-size: 18px; line-height: 1.6; }
+    .hero p:nth-of-type(2) { max-width: 600px; margin: 16px 0 0; color: #dbeafe; font-size: 18px; line-height: 1.6; }
+    
+    .stats-bar { display: flex; gap: 16px; margin-top: 32px; flex-wrap: wrap; }
+    .stat-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 16px; border-radius: 16px; flex: 1; min-width: 180px; backdrop-filter: blur(8px); }
+    .stat-card b { display: block; font-size: 28px; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 4px; }
+    .stat-card span { font-size: 13px; color: #dbeafe; font-weight: 500; line-height: 1.4; display: block; }
     
     /* Tabs */
     .tabs { display: flex; gap: 10px; margin: 30px 0; overflow: auto; padding: 4px; scrollbar-width: none; }
@@ -236,9 +241,25 @@
   
   <section class="hero">
     <svg class="bg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-    <p class="eyebrow">One identity, many services</p>
-    <h1>Verify once. Reuse everywhere.</h1>
-    <p>Government portals can use a citizen’s already verified documents — with their clear consent, not another upload.</p>
+    <p class="eyebrow">Verify once. Reuse everywhere.</p>
+    <h1>DigiLocker stores your documents. VerifyOnce stores your trust.</h1>
+    <p>No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</p>
+    
+    <div class="stats-bar">
+      <div class="stat-card">
+        <b>500M+</b>
+        <span>DigiLocker users in India</span>
+      </div>
+      <div class="stat-card">
+        <b>5-10x</b>
+        <span>re-verifications per citizen</span>
+      </div>
+      <div class="stat-card">
+        <b>Zero</b>
+        <span>re-uploads with one reuse</span>
+      </div>
+    </div>
+    <small style="display:block;margin-top:12px;color:#93c5fd;font-size:12px;">*Illustrative/estimated figures for demo purposes</small>
   </section>
   
   <nav class="tabs">
@@ -249,6 +270,9 @@
     <button class="tab" data-view="scholarship">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
       Scholarship Portal
+    </button>
+    <button class="tab" data-view="pds">
+      🌾 PDS Portal (Rural)
     </button>
     <button class="tab" data-view="consent">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -274,7 +298,7 @@
           Service portal · Ration Card
         </span>
         <h2>Verify your identity</h2>
-        <p class="sub">Upload once. Your verified identity can be reused for other services when you approve it.</p>
+        <p class="sub">Verify once. No re-uploads, no re-checks, ever. Your verified identity can be reused instantly across services.</p>
         
         <div class="progress" id="rProgress">
           <span id="stepLabel">Step 1 of 3: Phone number</span>
@@ -490,7 +514,7 @@
           Service portal · Scholarship
         </span>
         <h2>Start scholarship application</h2>
-        <p class="sub">Check whether your identity is already verified through another service.</p>
+        <p class="sub">Zero re-uploads required. Instantly reuse your verified identity from other services.</p>
         
         <div class="sample">
           <strong>Try the reuse moment</strong>
@@ -569,6 +593,67 @@
             <b>You stay in control</b>
             <span style="color:var(--muted)">The consent log shows exactly when a portal reused your verification.</span>
           </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- PORTAL C: PDS (RURAL) -->
+  <section id="pds" class="view">
+    <div class="layout">
+      <article class="card" style="padding: 32px; border: 2px solid #fde68a;">
+        <span class="portal-tag" style="background:#fef3c7; color:#92400e;">
+          🌾 Service portal · PDS (Rural)
+        </span>
+        <h2 style="font-size: 28px; margin-bottom: 12px;">Get your Ration</h2>
+        <p class="sub" style="font-size: 17px; margin-bottom: 32px;">Fast verification optimized for low network areas. No re-uploads, no re-checks, ever.</p>
+        
+        <div class="sample" style="background:#fefce8; border-color:#fde047; padding:24px;">
+          <strong style="color:#854d0e; font-size:18px;">Try the reuse moment</strong>
+          <p style="color:#a16207; font-size:16px;">Pre-verified sample citizen: <b style="color:#713f12">Meera Patel · 9876543210</b></p>
+          <button class="secondary" id="pdsTrySample" style="width:auto; padding:16px 20px; font-size:16px; border-color:#facc15;">Use sample number</button>
+        </div>
+        
+        <div class="field" style="margin-top: 32px;">
+          <label for="pPhone" style="font-size: 16px;">Citizen Phone Number</label>
+          <input id="pPhone" inputmode="numeric" placeholder="Enter 10-digit number" style="padding: 20px; font-size: 20px;">
+        </div>
+        <button class="primary" id="pdsCheckVault" style="padding: 20px; font-size: 18px; background:#ca8a04;">Check Verified Identity</button>
+        
+        <div class="loading" id="pdsVerifying">
+          <div class="spinner" style="border-top-color:#ca8a04;"></div>
+          <span id="pdsLoadMsg" style="font-size:18px;">Connecting slowly... Please wait...</span>
+        </div>
+
+        <div class="reuse" id="pdsReuseBanner" style="margin-top: 32px; padding:32px; background:#fefce8; border-color:#facc15;">
+          <div class="big-check" style="background:#ca8a04;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <h2 style="font-size: 24px; color:#854d0e;">Found Verified Record</h2>
+          <p id="pdsReuseText" style="font-size: 16px; color:#a16207;"></p>
+          <button class="primary use-button" id="pdsUseIdentity" style="padding: 20px; font-size: 18px; background:#ca8a04; box-shadow:none;">Use Identity Now</button>
+        </div>
+        
+        <div class="fallback" id="pdsFallback">
+          <h3 style="font-size:20px;">No identity found.</h3>
+          <p style="font-size:16px;">Cannot proceed without documents.</p>
+        </div>
+        
+        <div class="appdone" id="pdsDone" style="font-size: 18px; padding: 24px; border-color:#fde047; background:#fefce8;">
+          <span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:22px;margin-bottom:8px; color:#854d0e;">
+            <svg style="color:#ca8a04" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Done!
+          </span>
+          <span style="color:#a16207;">Identity used successfully. Proceed to collect rations.</span>
+        </div>
+      </article>
+
+      <aside class="card">
+        <h2>Works everywhere</h2>
+        <p class="sub">This simulates a rural portal designed for low-connectivity environments.</p>
+        <div class="comp-block comp-3" style="background:#fefce8; border-color:#fde047;">
+          <b style="color:#854d0e;">Zero re-uploads</b>
+          <p style="color:#a16207;">Since the identity is fetched locally or through a lightweight payload, it completely bypasses the need for megabytes of document uploads, working flawlessly even on 2G connections.</p>
         </div>
       </aside>
     </div>
@@ -802,6 +887,54 @@
   // Portal B
   byId('trySample').onclick = () => { byId('sPhone').value = seed.phone; checkVault(); };
   byId('checkVault').onclick = checkVault;
+
+  // Portal C (PDS)
+  byId('pdsTrySample').onclick = () => { byId('pPhone').value = seed.phone; checkPdsVault(); };
+  byId('pdsCheckVault').onclick = checkPdsVault;
+
+  function checkPdsVault() {
+    const phone = byId('pPhone').value.trim();
+    if(!phone) { byId('pPhone').focus(); return; }
+    
+    // Simulate low bandwidth
+    byId('pdsReuseBanner').style.display = 'none';
+    byId('pdsFallback').style.display = 'none';
+    byId('pdsDone').style.display = 'none';
+    byId('pdsVerifying').style.display = 'block';
+    byId('pdsCheckVault').style.display = 'none';
+
+    setTimeout(() => {
+      byId('pdsVerifying').style.display = 'none';
+      byId('pdsCheckVault').style.display = 'inline-flex';
+      
+      const person = vault.find(v => v.phone === phone);
+      if(person) {
+        byId('pdsReuseText').innerHTML = `<b>${person.name}'s</b> identity was verified by <b>${person.verifiedBy}</b>.`;
+        const banner = byId('pdsReuseBanner');
+        banner.style.display = 'block';
+        banner.classList.remove('celebrate');
+        void banner.offsetWidth; 
+        banner.classList.add('celebrate');
+        byId('pdsUseIdentity').dataset.phone = phone;
+      } else {
+        byId('pdsFallback').style.display = 'block';
+      }
+    }, 2500); // Slower fake loading
+  }
+
+  byId('pdsUseIdentity').onclick = () => {
+    const phone = byId('pdsUseIdentity').dataset.phone;
+    const person = vault.find(v => v.phone === phone);
+    consentLog.unshift({
+      name: person.name, phone, usedBy: 'PDS Portal (Rural)', 
+      source: person.verifiedBy, date: Date.now(), 
+      scope: 'Verified identity'
+    });
+    persist();
+    byId('pdsReuseBanner').style.display = 'none';
+    byId('pdsDone').style.display = 'block';
+    showToast('Identity securely reused on low bandwidth');
+  };
   
   function checkVault() {
     const phone = byId('sPhone').value.trim();
@@ -894,8 +1027,8 @@
   byId('langToggle').onclick = () => {
     const hi = byId('langToggle').textContent === 'हिंदी';
     byId('langToggle').textContent = hi ? 'English' : 'हिंदी';
-    document.querySelector('.hero h1').textContent = hi ? 'एक बार सत्यापित करें। हर जगह उपयोग करें।' : 'Verify once. Reuse everywhere.';
-    document.querySelector('.hero p:last-child').textContent = hi ? 'सरकारी सेवाएं आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकती हैं।' : 'Government portals can use a citizen’s already verified documents — with their clear consent, not another upload.';
+    document.querySelector('.hero h1').textContent = hi ? 'डिजिलॉकर आपके दस्तावेज़ सुरक्षित रखता है। VerifyOnce आपका भरोसा सुरक्षित रखता है।' : 'DigiLocker stores your documents. VerifyOnce stores your trust.';
+    document.querySelector('.hero p:nth-of-type(2)').textContent = hi ? 'कोई बार-बार अपलोड नहीं, कोई बार-बार जांच नहीं। सरकारी पोर्टल आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकते हैं।' : 'No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.';
   };
 
   // Init
