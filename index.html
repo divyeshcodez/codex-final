@@ -253,8 +253,8 @@
   <section class="hero">
     <svg class="bg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
     <p class="eyebrow">Verify once. Reuse everywhere.</p>
-    <h1>DigiLocker stores your documents. VerifyOnce stores your trust.</h1>
-    <p>No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</p>
+    <h1>Verify once. Apply faster. Stay accountable.</h1>
+    <p>DigiLocker stores your documents. VerifyOnce stores your trust.<br><span style="font-size:16px; color:#dbeafe;">No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</span></p>
     
     <div class="stats-bar">
       <div class="stat-card">
@@ -285,9 +285,17 @@
     <button class="tab" data-view="pds">
       🌾 PDS Portal (Rural)
     </button>
+    <button class="tab" data-view="certificate">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Certificate Portal
+    </button>
     <button class="tab" data-view="consent">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       My consent log
+    </button>
+    <button class="tab" data-view="escalations">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      Escalation log
     </button>
     <button class="tab" data-view="csc">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -685,6 +693,135 @@
         </div>
       </aside>
     </div>
+  </section>
+
+  <!-- PORTAL D: CERTIFICATE PORTAL -->
+  <section id="certificate" class="view">
+    <div class="layout">
+      <article class="card">
+        <span class="portal-tag">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Service portal · Certificates
+        </span>
+        <h2>Apply for Certificate</h2>
+        <p class="sub">Verify your identity instantly and track your application status strictly.</p>
+
+        <div class="sample" style="margin-bottom: 24px;">
+          <strong>Try the reuse moment</strong>
+          <p>Pre-verified sample citizen: <b style="color:var(--navy)">Meera Patel · 9876543210</b></p>
+          <button class="secondary" onclick="byId('cPhone').value='9876543210'; byId('cCheckVault').click()" style="width:auto">Use sample number</button>
+        </div>
+
+        <div id="certStep1">
+          <div class="field">
+            <label for="cPhone">Phone number</label>
+            <input id="cPhone" inputmode="numeric" placeholder="Enter 10-digit mobile number">
+          </div>
+          <button class="primary" id="cCheckVault">Verify Identity</button>
+          
+          <div class="validating-step" id="cValidating">
+            <div class="spinner"></div>
+            Validating signature ✓
+          </div>
+          
+          <div class="fallback" id="cFallback" style="display:none; margin-top:24px;">
+            <h3 style="color:#ef4444">Identity not found</h3>
+            <p>Please complete verification first.</p>
+          </div>
+        </div>
+
+        <div id="certStep2" style="display:none; animation: slideUp 0.3s ease;">
+          <div class="appdone" style="display:block; margin: 0 0 24px 0; border-color:var(--blue); background:#eff6ff;">
+            <span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px; color:var(--blue);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Identity verified
+            </span>
+            <span id="cIdentText" style="color:var(--navy); font-size:14px;"></span>
+          </div>
+
+          <form id="certForm">
+            <div class="field">
+              <label for="certType">Certificate Type</label>
+              <select id="certType" style="width:100%; padding:14px 16px; border-radius:12px; border:1.5px solid #cbd5e1; font:inherit; color:var(--navy); background:#f8fafc;">
+                <option value="Income Certificate">Income Certificate</option>
+                <option value="Caste Certificate">Caste Certificate</option>
+                <option value="Domicile Certificate">Domicile Certificate</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="certPurpose">Purpose</label>
+              <input id="certPurpose" required placeholder="e.g. College admission">
+            </div>
+            <button class="primary" type="submit">Submit Application</button>
+          </form>
+        </div>
+
+        <div id="certStep3" style="display:none; animation: slideUp 0.3s ease;">
+          <h3 style="margin-bottom:16px;">Application Status</h3>
+          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+              <span style="color:var(--muted); font-size:14px; font-weight:600;">App ID: <b style="color:var(--navy)" id="cAppId"></b></span>
+              <span style="color:var(--muted); font-size:14px; font-weight:600;" id="cDate"></span>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:24px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="height:24px; width:24px; border-radius:50%; background:var(--green); color:white; display:grid; place-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                <b style="color:var(--navy);">Filed successfully</b>
+              </div>
+              <div style="width:2px; height:20px; background:var(--line); margin-left:11px; margin-top:-12px; margin-bottom:-12px;"></div>
+              
+              <div style="display:flex; align-items:center; gap:12px;" id="statusReview">
+                <div class="spinner" style="height:24px; width:24px; border-width:3px; border-top-color:var(--blue); margin:0;" id="reviewSpinner"></div>
+                <div style="height:24px; width:24px; border-radius:50%; background:#ef4444; color:white; display:none; place-items:center;" id="escalatedIcon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                <div>
+                  <b style="color:var(--blue);" id="statusText">Under Review</b>
+                  <div style="font-size:13px; color:var(--muted);" id="statusSub">Awaiting official approval</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:#fefce8; border:1px solid #fde047; padding:16px; border-radius:12px;" id="slaBox">
+              <div style="display:flex; align-items:center; gap:8px; color:#854d0e; font-weight:700; margin-bottom:4px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                SLA Countdown
+              </div>
+              <div style="font-size:14px; color:#a16207; line-height:1.4;">Official deadline: 15 days. If not processed, auto-escalates to District Officer.</div>
+              <div style="font-size:20px; font-weight:800; color:#ca8a04; margin-top:8px; font-variant-numeric: tabular-nums;" id="slaTimer">15 days 00:00:00</div>
+              
+              <button class="secondary" style="margin-top:16px; padding:8px 12px; font-size:13px; width:auto; border-color:#facc15;" id="fastForwardBtn">Demo: Fast-forward 15 days</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <aside class="card">
+        <h2>Accountability built-in</h2>
+        <p class="sub">VerifyOnce doesn't just speed up applications, it enforces government SLAs.</p>
+        
+        <div class="comp-block comp-2" style="background:#f0fdfa; border-color:#99f6e4;">
+          <b style="color:#0f766e;">Auto-escalation</b>
+          <p style="color:#115e59;">If an application breaches its 15-day service guarantee, the system automatically marks it as escalated without the citizen needing to complain.</p>
+        </div>
+        <div class="comp-block comp-2" style="background:#eff6ff; border-color:#bfdbfe;">
+          <b style="color:#1e40af;">Public Transparency</b>
+          <p style="color:#1e3a8a;">Escalation logs provide clear audit trails, showing exactly when deadlines are missed.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ESCALATION LOG -->
+  <section id="escalations" class="view">
+    <div class="consent-hero" style="background:#fef2f2; border-color:#fca5a5;">
+      <h2 style="color:#b91c1c;">Escalation Log</h2>
+      <p style="color:#991b1b;">Track applications that exceeded their official SLA deadline and were automatically escalated.</p>
+    </div>
+    <article class="card">
+      <h2>SLA Breaches</h2>
+      <p class="sub">Auto-escalated applications</p>
+      <div id="escalationList"></div>
+    </article>
   </section>
 
   <!-- CONSENT LOG -->
@@ -1140,6 +1277,134 @@
     `;
   }
 
+  // Certificate Portal
+  let certAppInterval;
+  
+  byId('cCheckVault').onclick = () => {
+    const phone = byId('cPhone').value.trim();
+    const person = vault.find(v => v.phone === phone);
+    
+    byId('cFallback').style.display = 'none';
+    
+    if(!phone) { byId('cPhone').focus(); return; }
+    
+    if(person && !person.revoked) {
+      byId('cValidating').style.display = 'flex';
+      byId('cCheckVault').style.display = 'none';
+      
+      setTimeout(() => {
+        byId('cValidating').style.display = 'none';
+        byId('certStep1').style.display = 'none';
+        
+        byId('cIdentText').innerHTML = `<b style="color:var(--navy)">${person.name}'s</b> identity (via ${person.verifiedBy}) is instantly reused.`;
+        byId('certStep2').style.display = 'block';
+        
+        // Log consent
+        consentLog.unshift({
+          name: person.name, phone, usedBy: 'Certificate Portal', 
+          source: person.verifiedBy, date: Date.now(), 
+          scope: 'Identity verified'
+        });
+        persist();
+      }, 1000);
+    } else {
+      byId('cFallback').style.display = 'block';
+      byId('cCheckVault').style.display = 'inline-flex';
+    }
+  };
+
+  byId('certForm').onsubmit = e => {
+    e.preventDefault();
+    byId('certStep2').style.display = 'none';
+    byId('certStep3').style.display = 'block';
+    
+    const appId = 'CERT-' + Math.floor(Math.random()*1000000);
+    byId('cAppId').textContent = appId;
+    byId('cDate').textContent = new Date().toLocaleDateString('en-IN');
+    
+    // Reset styling just in case
+    byId('slaBox').style.background = '#fefce8';
+    byId('slaBox').style.borderColor = '#fde047';
+    byId('slaTimer').style.color = '#ca8a04';
+    byId('fastForwardBtn').style.display = 'inline-flex';
+    byId('reviewSpinner').style.display = 'block';
+    byId('escalatedIcon').style.display = 'none';
+    byId('statusText').textContent = 'Under Review';
+    byId('statusText').style.color = 'var(--blue)';
+    byId('statusSub').innerHTML = 'Awaiting official approval';
+    
+    // Start fake SLA timer
+    let timeRemaining = 15 * 86400; // 15 days in seconds
+    clearInterval(certAppInterval);
+    
+    const updateTimer = () => {
+      if(timeRemaining <= 0) {
+        clearInterval(certAppInterval);
+        triggerEscalation(appId);
+        return;
+      }
+      const d = Math.floor(timeRemaining / 86400);
+      const h = Math.floor((timeRemaining % 86400) / 3600);
+      const m = Math.floor((timeRemaining % 3600) / 60);
+      const s = timeRemaining % 60;
+      byId('slaTimer').textContent = `${d} days ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+      timeRemaining--;
+    };
+    
+    certAppInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  };
+
+  byId('fastForwardBtn').onclick = () => {
+    clearInterval(certAppInterval);
+    triggerEscalation(byId('cAppId').textContent);
+  };
+  
+  let escalations = JSON.parse(localStorage.getItem('verifyOnceEscalations')||'null') || [];
+  
+  function triggerEscalation(appId) {
+    byId('slaBox').style.background = '#fef2f2';
+    byId('slaBox').style.borderColor = '#fca5a5';
+    byId('slaTimer').textContent = 'SLA Breached';
+    byId('slaTimer').style.color = '#ef4444';
+    byId('fastForwardBtn').style.display = 'none';
+    
+    byId('reviewSpinner').style.display = 'none';
+    byId('escalatedIcon').style.display = 'grid';
+    byId('statusText').textContent = 'Escalated to District Officer';
+    byId('statusText').style.color = '#ef4444';
+    byId('statusSub').innerHTML = '⚠️ SLA missed. Auto-escalated.';
+    
+    const type = byId('certType').value;
+    escalations.unshift({
+      appId, type, date: Date.now(), status: 'Escalated to DO'
+    });
+    localStorage.setItem('verifyOnceEscalations', JSON.stringify(escalations));
+    renderEscalations();
+  }
+  
+  function renderEscalations() {
+    const node = byId('escalationList');
+    if(!node) return;
+    node.innerHTML = escalations.length ? escalations.map(x => `
+      <div class="consent-row">
+        <div class="consent-icon" style="background:#fee2e2; color:#ef4444;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+        <div style="flex:1">
+          <b style="color:#b91c1c;">${x.appId} - ${x.type}</b>
+          <p style="color:#991b1b;">Status: ${x.status} · 15-day SLA Breached</p>
+        </div>
+        <span class="date" style="background:#fef2f2; color:#b91c1c;">${formatTime(x.date)}</span>
+      </div>
+    `).join('') : `
+      <div class="empty">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p style="font-size:16px;font-weight:500;color:var(--navy)">No escalations yet.</p>
+        <p>Applications that breach their SLA will appear here.</p>
+      </div>
+    `;
+  }
+  renderEscalations();
+
   // Misc
   let offline = false;
   byId('offlineToggle').onclick = () => {
@@ -1168,8 +1433,8 @@
   byId('langToggle').onclick = () => {
     const hi = byId('langToggle').textContent === 'हिंदी';
     byId('langToggle').textContent = hi ? 'English' : 'हिंदी';
-    document.querySelector('.hero h1').textContent = hi ? 'डिजिलॉकर आपके दस्तावेज़ सुरक्षित रखता है। VerifyOnce आपका भरोसा सुरक्षित रखता है।' : 'DigiLocker stores your documents. VerifyOnce stores your trust.';
-    document.querySelector('.hero p:nth-of-type(2)').textContent = hi ? 'कोई बार-बार अपलोड नहीं, कोई बार-बार जांच नहीं। सरकारी पोर्टल आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकते हैं।' : 'No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.';
+    document.querySelector('.hero h1').textContent = hi ? 'एक बार सत्यापित करें। तेजी से आवेदन करें। जवाबदेह रहें।' : 'Verify once. Apply faster. Stay accountable.';
+    document.querySelector('.hero p:nth-of-type(2)').innerHTML = hi ? 'डिजिलॉकर आपके दस्तावेज़ सुरक्षित रखता है। VerifyOnce आपका भरोसा सुरक्षित रखता है।<br><span style="font-size:16px; color:#dbeafe;">कोई बार-बार अपलोड नहीं, कोई बार-बार जांच नहीं। सरकारी पोर्टल आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकते हैं।</span>' : 'DigiLocker stores your documents. VerifyOnce stores your trust.<br><span style="font-size:16px; color:#dbeafe;">No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</span>';
   };
 
   // Init
