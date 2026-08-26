@@ -47,8 +47,7 @@
     .stat-card span { font-size: 13px; color: #dbeafe; font-weight: 500; line-height: 1.4; display: block; }
     
     /* Tabs */
-    .tabs { display: flex; gap: 10px; margin: 30px 0; overflow: auto; padding: 4px; scrollbar-width: none; }
-    .tabs::-webkit-scrollbar { display: none; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0; padding: 4px; }
     .tab { border: 1px solid transparent; background: transparent; color: var(--muted); font-weight: 600; padding: 12px 18px; border-radius: 14px; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-size: 15px; }
     .tab:hover { background: #f1f5f9; color: var(--navy); }
     .tab.active { background: #fff; color: var(--blue); border-color: var(--line); box-shadow: 0 4px 10px rgba(0,0,0,0.03); font-weight: 700; }
