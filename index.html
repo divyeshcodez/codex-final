@@ -248,6 +248,17 @@
       <button class="lang" id="langToggle">हिंदी</button>
     </div>
   </header>
+
+  <div class="offline-note" id="offlineNote" style="display:none; flex-direction: column; align-items: flex-start; margin-bottom: 24px;">
+    <div style="display:flex; align-items:center; gap: 10px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20"></path><path d="M8.53 8.53C5.52 10.33 3 13.53 3 17"></path><path d="M14 14c-1.63 0-3.03.65-4.05 1.7"></path><path d="M11 21A1 1 0 0 0 13 21"></path><path d="M20.25 14C21 14.88 21 15.9 21 17"></path><path d="M18.15 8.15C19.95 10.15 21 12.87 21 16"></path><path d="M4.64 4.64C7 2.45 10.22 1 13.88 1c4.87 0 9 2.58 11.45 6.45"></path></svg>
+      Offline mode: actions are saved locally and will sync when online.
+    </div>
+    <div id="offlineQueueContainer" style="display:none; margin-top: 12px; width: 100%;">
+      <strong style="font-size: 13px; color: #78350f;">Pending sync:</strong>
+      <ul id="offlineQueueList" style="margin: 6px 0 0; padding-left: 20px; font-size: 13px; color: #92400e;"></ul>
+    </div>
+  </div>
   
   <section class="hero">
     <svg class="bg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -304,11 +315,6 @@
 
   <!-- PORTAL A: RATION CARD -->
   <section id="ration" class="view active">
-    <div class="offline-note" id="offlineNote">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20"></path><path d="M8.53 8.53C5.52 10.33 3 13.53 3 17"></path><path d="M14 14c-1.63 0-3.03.65-4.05 1.7"></path><path d="M11 21A1 1 0 0 0 13 21"></path><path d="M20.25 14C21 14.88 21 15.9 21 17"></path><path d="M18.15 8.15C19.95 10.15 21 12.87 21 16"></path><path d="M4.64 4.64C7 2.45 10.22 1 13.88 1c4.87 0 9 2.58 11.45 6.45"></path></svg>
-      Offline mode: this verification is saved locally and will sync when online.
-    </div>
-    
     <div class="layout">
       <article class="card">
         <span class="portal-tag">
@@ -874,6 +880,19 @@
  </main>
 
  <!-- MODALS -->
+ <div class="modal" id="cscCitizenModal">
+  <div class="dialog" style="border: 4px solid #334155; border-radius: 32px; padding: 24px; max-width: 320px;">
+    <div style="text-align: center; color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 16px;">Simulated citizen device</div>
+    <span class="portal-tag">Consent request</span>
+    <h2>Allow CSC Operator?</h2>
+    <p>Operator wants to use your verified identity.</p>
+    <div class="dialog-actions">
+      <button class="secondary" id="cscDenyConsent">Deny</button>
+      <button class="primary use-button" id="cscAllowConsent">Allow</button>
+    </div>
+  </div>
+ </div>
+
  <div class="modal" id="consentModal">
   <div class="dialog">
     <span class="portal-tag">Consent request</span>
@@ -1058,27 +1077,39 @@
       const isDigilocker = !byId('extraFields').classList.contains('hidden');
       const docs = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
       
-      vault = vault.filter(v => v.phone !== phone);
+      const phone_val = byId('rPhone').value.trim();
+      const isDigilocker = !byId('extraFields').classList.contains('hidden');
+      const docs_val = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
+      
       const expiry = new Date(Date.now() + 90 * 86400000);
       const newPerson = {
         name: byId('rName').value.trim(),
-        phone,
+        phone: phone_val,
         verifiedAt: Date.now(),
         validUntil: expiry.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}),
         verifiedBy: 'Ration Card Portal',
-        documents: docs
+        documents: docs_val
       };
       
       const token = generateMockJWT({
-        citizen_id: phone,
+        citizen_id: phone_val,
         verified_by: newPerson.verifiedBy,
         verified_at: newPerson.verifiedAt,
         expires_at: expiry.getTime()
       });
       newPerson.proofToken = token;
       
-      vault.push(newPerson);
-      persist();
+      const action = () => {
+        vault = vault.filter(v => v.phone !== phone_val);
+        vault.push(newPerson);
+        persist();
+      };
+
+      if (offline) {
+        addOfflineAction('Verify identity for ' + newPerson.name, action);
+      } else {
+        action();
+      }
       
       byId('jwtToken').textContent = token;
       
@@ -1150,12 +1181,20 @@
   byId('pdsUseIdentity').onclick = () => {
     const phone = byId('pdsUseIdentity').dataset.phone;
     const person = vault.find(v => v.phone === phone);
-    consentLog.unshift({
-      name: person.name, phone, usedBy: 'PDS Portal (Rural)', 
-      source: person.verifiedBy, date: Date.now(), 
-      scope: 'Verified identity'
-    });
-    persist();
+    const action = () => {
+      consentLog.unshift({
+        name: person.name, phone, usedBy: 'PDS Portal (Rural)', 
+        source: person.verifiedBy, date: Date.now(), 
+        scope: 'Verified identity'
+      });
+      persist();
+      renderConsent();
+    };
+    if (offline) {
+      addOfflineAction('PDS Consent for ' + person.name, action);
+    } else {
+      action();
+    }
     byId('pdsReuseBanner').style.display = 'none';
     byId('pdsDone').style.display = 'block';
     showToast('Identity securely reused on low bandwidth');
@@ -1210,12 +1249,20 @@
     const phone = byId('useIdentity').dataset.phone;
     const person = vault.find(v => v.phone === phone);
     
-    consentLog.unshift({
-      name: person.name, phone, usedBy: 'Scholarship Portal', 
-      source: person.verifiedBy, date: Date.now(), 
-      scope: 'Identity verified, address verified, validity date'
-    });
-    persist();
+    const action = () => {
+      consentLog.unshift({
+        name: person.name, phone, usedBy: 'Scholarship Portal', 
+        source: person.verifiedBy, date: Date.now(), 
+        scope: 'Identity verified, address verified, validity date'
+      });
+      persist();
+      renderConsent();
+    };
+    if (offline) {
+      addOfflineAction('Scholarship Consent for ' + person.name, action);
+    } else {
+      action();
+    }
     
     byId('consentModal').classList.remove('show');
     byId('reuseBanner').style.display = 'none';
@@ -1299,12 +1346,20 @@
         byId('certStep2').style.display = 'block';
         
         // Log consent
-        consentLog.unshift({
-          name: person.name, phone, usedBy: 'Certificate Portal', 
-          source: person.verifiedBy, date: Date.now(), 
-          scope: 'Identity verified'
-        });
-        persist();
+        const action = () => {
+          consentLog.unshift({
+            name: person.name, phone, usedBy: 'Certificate Portal', 
+            source: person.verifiedBy, date: Date.now(), 
+            scope: 'Identity verified'
+          });
+          persist();
+          renderConsent();
+        };
+        if (offline) {
+          addOfflineAction('Certificate Consent for ' + person.name, action);
+        } else {
+          action();
+        }
       }, 1000);
     } else {
       byId('cFallback').style.display = 'block';
@@ -1404,7 +1459,20 @@
   }
   renderEscalations();
 
-  // Misc
+  // Offline Queue Logic
+  let offlineQueue = [];
+  function addOfflineAction(description, actionFn) {
+    offlineQueue.push({ description, actionFn });
+    renderOfflineQueue();
+    showToast('Action saved for offline sync', false);
+  }
+  function renderOfflineQueue() {
+    const list = byId('offlineQueueList');
+    const container = byId('offlineQueueContainer');
+    list.innerHTML = offlineQueue.map(q => `<li>${q.description} <span class="sync-status" style="margin-left:8px;font-weight:600;">(Pending)</span></li>`).join('');
+    container.style.display = offlineQueue.length > 0 ? 'block' : 'none';
+  }
+
   let offline = false;
   byId('offlineToggle').onclick = () => {
     offline = !offline;
@@ -1414,26 +1482,137 @@
     byId('offlineToggle').style.color = offline ? '#92400e' : '';
     byId('offlineToggle').style.background = offline ? '#fde68a' : '';
     byId('offlineNote').style.display = offline ? 'flex' : 'none';
+
+    if (!offline && offlineQueue.length > 0) {
+      const listItems = byId('offlineQueueList').querySelectorAll('li');
+      listItems.forEach(li => {
+        const stat = li.querySelector('.sync-status');
+        stat.textContent = '(Processing...)';
+        stat.style.color = 'var(--blue)';
+      });
+      setTimeout(() => {
+        offlineQueue.forEach(q => q.actionFn());
+        listItems.forEach(li => {
+          const stat = li.querySelector('.sync-status');
+          stat.textContent = '(Synced ✓)';
+          stat.style.color = 'var(--green)';
+        });
+        showToast('All offline actions synced!');
+        setTimeout(() => {
+          offlineQueue = [];
+          renderOfflineQueue();
+        }, 2000);
+      }, 1500);
+    }
   };
   
+  let currentCscPhone = '';
   byId('cscLookup').onclick = () => {
-    const p = vault.find(x => x.phone === byId('cscPhone').value.trim());
+    const phone = byId('cscPhone').value.trim();
+    const p = vault.find(x => x.phone === phone);
     const n = byId('cscResult');
-    n.style.display = 'block';
     if(p && p.revoked) {
+       n.style.display = 'block';
        n.innerHTML = '<span style="color:#ef4444;font-weight:600;">Verification revoked — please re-verify.</span>';
        return;
     }
-    n.innerHTML = p ? 
-      `<span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;"><svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${p.name} is verified</span>Valid until ${p.validUntil}. Ask the citizen to approve sharing on their phone.` : 
-      'No verified identity found. Help the citizen complete the Ration Card verification.';
+    if (p) {
+      currentCscPhone = phone;
+      byId('cscCitizenModal').classList.add('show');
+    } else {
+      n.style.display = 'block';
+      n.innerHTML = 'No verified identity found. Help the citizen complete the Ration Card verification.';
+    }
+  };
+
+  byId('cscDenyConsent').onclick = () => {
+    byId('cscCitizenModal').classList.remove('show');
+    const n = byId('cscResult');
+    n.style.display = 'block';
+    n.innerHTML = '<span style="color:#ef4444;font-weight:600;">Citizen denied the request.</span>';
+  };
+
+  byId('cscAllowConsent').onclick = () => {
+    byId('cscCitizenModal').classList.remove('show');
+    const p = vault.find(x => x.phone === currentCscPhone);
+    const action = () => {
+      consentLog.unshift({
+        name: p.name, phone: currentCscPhone, usedBy: 'CSC Operator', 
+        source: p.verifiedBy, date: Date.now(), 
+        scope: 'Verified identity'
+      });
+      persist();
+      renderConsent();
+      const n = byId('cscResult');
+      n.style.display = 'block';
+      n.innerHTML = `<span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;"><svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${p.name} is verified</span>Valid until ${p.validUntil}.`;
+    };
+    if (offline) {
+      addOfflineAction('CSC Consent for ' + p.name, action);
+      const n = byId('cscResult');
+      n.style.display = 'block';
+      n.innerHTML = `<span style="color:#ca8a04;font-weight:600;">Consent saved locally. Will sync when online.</span>`;
+    } else {
+      action();
+    }
   };
   
+  const dict = {
+    "Ration Card Portal": "राशन कार्ड पोर्टल",
+    "Scholarship Portal": "छात्रवृत्ति पोर्टल",
+    "🌾 PDS Portal (Rural)": "🌾 पीडीएस पोर्टल (ग्रामीण)",
+    "Certificate Portal": "प्रमाणपत्र पोर्टल",
+    "My consent log": "मेरा सहमति लॉग",
+    "Escalation log": "वृद्धि लॉग",
+    "CSC assisted mode": "सीएससी सहायता मोड",
+    "Verify your identity": "अपनी पहचान सत्यापित करें",
+    "Start scholarship application": "छात्रवृत्ति आवेदन शुरू करें",
+    "Get your Ration": "अपना राशन प्राप्त करें",
+    "Apply for Certificate": "प्रमाणपत्र के लिए आवेदन करें",
+    "Escalation Log": "वृद्धि लॉग",
+    "Your consent, clearly recorded": "आपकी सहमति, स्पष्ट रूप से दर्ज",
+    "Active verifications": "सक्रिय सत्यापन",
+    "Consent activity": "सहमति गतिविधि",
+    "Help a citizen reuse verification": "नागरिक को सत्यापन का पुन: उपयोग करने में मदद करें",
+    "Send OTP": "OTP भेजें",
+    "Verify documents": "दस्तावेज़ सत्यापित करें",
+    "Fetch details from DigiLocker": "DigiLocker से विवरण प्राप्त करें",
+    "Check verification": "सत्यापन जांचें",
+    "Review and use verified identity": "सत्यापित पहचान की समीक्षा करें और उपयोग करें",
+    "Check Verified Identity": "सत्यापित पहचान जांचें",
+    "Use Identity Now": "अब पहचान का उपयोग करें",
+    "Verify Identity": "पहचान सत्यापित करें",
+    "Submit Application": "आवेदन जमा करें",
+    "Find verified identity": "सत्यापित पहचान खोजें",
+    "Phone number": "फ़ोन नंबर",
+    "Citizen Phone Number": "नागरिक फ़ोन नंबर",
+    "Citizen phone number": "नागरिक फ़ोन नंबर",
+    "Full name": "पूरा नाम",
+    "Enter OTP": "OTP दर्ज करें",
+    "SLA Breaches": "SLA उल्लंघन"
+  };
+  let isHindi = false;
+  function walkAndTranslate(node) {
+    if (node.nodeType === 3) {
+      let t = node.nodeValue.trim();
+      if (!t) return;
+      if (!node.originalText) { node.originalText = t; }
+      const key = node.originalText;
+      if (dict[key]) {
+        node.nodeValue = isHindi ? node.nodeValue.replace(key, dict[key]) : node.nodeValue.replace(dict[key], key);
+      }
+    } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+      node.childNodes.forEach(walkAndTranslate);
+    }
+  }
+
   byId('langToggle').onclick = () => {
-    const hi = byId('langToggle').textContent === 'हिंदी';
-    byId('langToggle').textContent = hi ? 'English' : 'हिंदी';
-    document.querySelector('.hero h1').textContent = hi ? 'एक बार सत्यापित करें। तेजी से आवेदन करें। जवाबदेह रहें।' : 'Verify once. Apply faster. Stay accountable.';
-    document.querySelector('.hero p:nth-of-type(2)').innerHTML = hi ? 'डिजिलॉकर आपके दस्तावेज़ सुरक्षित रखता है। VerifyOnce आपका भरोसा सुरक्षित रखता है।<br><span style="font-size:16px; color:#dbeafe;">कोई बार-बार अपलोड नहीं, कोई बार-बार जांच नहीं। सरकारी पोर्टल आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकते हैं।</span>' : 'DigiLocker stores your documents. VerifyOnce stores your trust.<br><span style="font-size:16px; color:#dbeafe;">No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</span>';
+    isHindi = !isHindi;
+    byId('langToggle').textContent = isHindi ? 'English' : 'हिंदी';
+    document.querySelector('.hero h1').textContent = isHindi ? 'एक बार सत्यापित करें। तेजी से आवेदन करें। जवाबदेह रहें।' : 'Verify once. Apply faster. Stay accountable.';
+    document.querySelector('.hero p:nth-of-type(2)').innerHTML = isHindi ? 'डिजिलॉकर आपके दस्तावेज़ सुरक्षित रखता है। VerifyOnce आपका भरोसा सुरक्षित रखता है।<br><span style="font-size:16px; color:#dbeafe;">कोई बार-बार अपलोड नहीं, कोई बार-बार जांच नहीं। सरकारी पोर्टल आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकते हैं।</span>' : 'DigiLocker stores your documents. VerifyOnce stores your trust.<br><span style="font-size:16px; color:#dbeafe;">No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</span>';
+    
+    document.querySelectorAll('.tab, .card, .consent-hero, label, button').forEach(walkAndTranslate);
   };
 
   // Init
