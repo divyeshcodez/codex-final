@@ -1073,10 +1073,6 @@
     byId('loadMsg').textContent = ' Checking documents securely…';
     
     setTimeout(() => {
-      const phone = byId('rPhone').value.trim();
-      const isDigilocker = !byId('extraFields').classList.contains('hidden');
-      const docs = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
-      
       const phone_val = byId('rPhone').value.trim();
       const isDigilocker = !byId('extraFields').classList.contains('hidden');
       const docs_val = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
