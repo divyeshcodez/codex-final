@@ -10,236 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VerifyOnce — Government document verification</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    /* Variables & Reset */
-    :root {
-      --navy: #0f172a; --blue: #2563eb; --blue-hover: #1d4ed8; --teal: #0d9488;
-      --green: #16a34a; --pale: #f0fdf4; --cream: #f8fafc; --ink: #334155;
-      --muted: #64748b; --line: #e2e8f0; 
-      --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.01);
-      --shadow-hover: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--cream); font-family: 'Inter', sans-serif; color: var(--ink); line-height: 1.5; -webkit-font-smoothing: antialiased; }
-    
-    /* Animations */
-    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
-    .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(22, 163, 74, 0); } 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); } }
-
-    /* Layout & Header */
-    .shell { max-width: 1100px; margin: auto; padding: 0 20px 40px; }
-    header { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; }
-    .brand { display: flex; gap: 12px; align-items: center; font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; }
-    .mark { background: var(--blue); color: #fff; height: 40px; width: 40px; border-radius: 12px; display: grid; place-items: center; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-    .mark svg { width: 24px; height: 24px; }
-    .lang { font-size: 14px; font-weight: 600; color: var(--teal); background: #ccfbf1; padding: 8px 14px; border-radius: 20px; border: 0; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-    .lang:hover { background: #99f6e4; }
-    
-    /* Hero */
-    .hero { background: linear-gradient(135deg, #1e3a8a, #2563eb); border-radius: 24px; color: #fff; padding: 40px; position: relative; overflow: hidden; box-shadow: var(--shadow); }
-    .hero svg.bg-icon { position: absolute; right: -2%; bottom: -40px; color: #fff; opacity: 0.1; width: 280px; height: 280px; }
-    .eyebrow { margin: 0 0 10px; color: #bfdbfe; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
-    .hero h1 { margin: 0; font-size: 38px; line-height: 1.15; max-width: 650px; font-weight: 800; letter-spacing: -0.02em; }
-    .hero p:nth-of-type(2) { max-width: 600px; margin: 16px 0 0; color: #dbeafe; font-size: 18px; line-height: 1.6; }
-    
-    .stats-bar { display: flex; gap: 16px; margin-top: 32px; flex-wrap: wrap; }
-    .stat-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 16px; border-radius: 16px; flex: 1; min-width: 180px; backdrop-filter: blur(8px); }
-    .stat-card b { display: block; font-size: 28px; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 4px; }
-    .stat-card span { font-size: 13px; color: #dbeafe; font-weight: 500; line-height: 1.4; display: block; }
-    
-    /* Tabs */
-    .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0; padding: 4px; }
-    .tab { border: 1px solid transparent; background: transparent; color: var(--muted); font-weight: 600; padding: 12px 18px; border-radius: 14px; white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-size: 15px; }
-    .tab:hover { background: #f1f5f9; color: var(--navy); }
-    .tab.active { background: #fff; color: var(--blue); border-color: var(--line); box-shadow: 0 4px 10px rgba(0,0,0,0.03); font-weight: 700; }
-    .tab svg { width: 18px; height: 18px; opacity: 0.8; }
-    .tab.active svg { opacity: 1; }
-
-    .view { display: none; }
-    .view.active { display: block; animation: fadeIn 0.4s ease; }
-    
-    .layout { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 24px; }
-    
-    /* Cards */
-    .card { background: #fff; border: 1px solid var(--line); border-radius: 24px; padding: 32px; box-shadow: var(--shadow); transition: box-shadow 0.3s ease; position: relative; }
-    .card:hover { box-shadow: var(--shadow-hover); }
-    h2 { font-size: 24px; margin: 0 0 8px; color: var(--navy); font-weight: 800; letter-spacing: -0.01em; }
-    h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--navy); }
-    .sub { margin: 0 0 24px; color: var(--muted); font-size: 15px; line-height: 1.6; }
-    
-    /* Forms */
-    label { display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; margin: 0 0 8px; color: var(--navy); }
-    input { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1.5px solid #cbd5e1; font: inherit; color: var(--navy); font-size: 16px; transition: all 0.2s; background: #f8fafc; }
-    input:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px #dbeafe; }
-    input.error { border-color: #ef4444; background: #fef2f2; }
-    input.error:focus { box-shadow: 0 0 0 4px #fee2e2; }
-    .error-msg { color: #ef4444; font-size: 13px; font-weight: 500; margin-top: 6px; display: none; }
-    .field { margin-bottom: 20px; position: relative; }
-    
-    .file { border: 2px dashed #cbd5e1; background: #f8fafc; border-radius: 16px; padding: 24px; text-align: center; color: var(--blue); font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-    .file:hover { border-color: var(--blue); background: #eff6ff; }
-    .file input { display: none; }
-    .file small { display: block; color: var(--muted); font-weight: 500; margin-top: 4px; font-size: 13px; }
-    .file svg { width: 28px; height: 28px; opacity: 0.7; }
-    
-    /* Buttons */
-    button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; font-family: inherit; }
-    .primary { background: var(--blue); color: #fff; width: 100%; padding: 16px; border-radius: 14px; font-weight: 700; font-size: 16px; border: 0; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-    .primary:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3); }
-    .primary:active { transform: translateY(1px); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2); }
-    .secondary { padding: 14px 16px; border: 1.5px solid #cbd5e1; background: #fff; color: var(--ink); border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s; width: 100%; }
-    .secondary:hover { background: #f1f5f9; border-color: #94a3b8; }
-    .back-btn { background: transparent; border: 0; color: var(--muted); font-weight: 600; font-size: 14px; padding: 8px 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; transition: all 0.2s; margin-left: -12px; }
-    .back-btn:hover { background: #f1f5f9; color: var(--navy); }
-    .back-btn svg { width: 16px; height: 16px; }
-
-    /* Tags */
-    .portal-tag { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 14px; border-radius: 20px; background: #eff6ff; color: #1e40af; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
-    .portal-tag svg { width: 16px; height: 16px; }
-    
-    /* Progress */
-    .progress { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; font-size: 13px; font-weight: 600; color: var(--muted); }
-    .progress-bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--blue); width: 33%; transition: width 0.4s ease; border-radius: 3px; }
-
-    /* Step containers */
-    .step-container { display: none; animation: slideUp 0.3s ease; }
-    .step-container.active { display: block; }
-
-    /* Components */
-    .how { display: grid; gap: 16px; }
-    .how div { display: flex; gap: 14px; align-items: flex-start; }
-    .number { background: #eff6ff; color: var(--blue); height: 32px; min-width: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
-    
-    .note { margin-top: 24px; background: #fef3c7; border-radius: 16px; padding: 20px; font-size: 14px; color: #92400e; line-height: 1.6; }
-    .note b { display: block; margin-bottom: 4px; color: #78350f; font-size: 15px; }
-    
-    .loading { display: none; text-align: center; padding: 40px 20px; color: var(--navy); font-weight: 600; font-size: 16px; }
-    .spinner { height: 44px; width: 44px; border-radius: 50%; border: 4px solid #e2e8f0; border-top-color: var(--blue); margin: 0 auto 16px; animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
-    
-    .success-box { display: none; background: var(--pale); border: 1.5px solid #86efac; border-radius: 16px; padding: 24px; margin-top: 20px; }
-    .success-header { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; color: #166534; margin-bottom: 8px; }
-    .success-box .check { display: grid; place-items: center; background: var(--green); height: 36px; width: 36px; border-radius: 50%; color: #fff; font-weight: 900; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .success-box .check svg { width: 20px; height: 20px; }
-    .success-box p { margin: 0; color: #15803d; line-height: 1.5; font-size: 15px; font-weight: 500; }
-    
-    .vault-card { border-left: 6px solid var(--teal); }
-    .vault-title { display: flex; align-items: center; gap: 12px; }
-    .vault-title i { font-style: normal; background: #ccfbf1; color: var(--teal); height: 44px; width: 44px; border-radius: 12px; display: grid; place-items: center; }
-    .vault-title i svg { width: 22px; height: 22px; }
-    .vault-stat { margin: 20px 0; padding: 18px; background: #f0fdfa; border-radius: 16px; border: 1px solid #ccfbf1; }
-    .vault-stat strong { font-size: 28px; color: var(--teal); display: block; line-height: 1; margin-bottom: 4px; font-weight: 800; }
-    .vault-stat span { font-size: 14px; color: #0f766e; font-weight: 500; }
-    
-    .sample { border: 1.5px solid #86efac; background: var(--pale); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
-    .sample strong { color: #166534; font-size: 16px; display: block; margin-bottom: 8px;}
-    .sample p { color: #15803d; margin: 0 0 16px; font-size: 14px; }
-    .sample .secondary { border-color: #86efac; color: #166534; }
-    .sample .secondary:hover { background: #dcfce7; }
-    
-    .reuse { display: none; background: linear-gradient(135deg, #ecfdf5, #f0fdf4); border: 2px solid #34d399; padding: 32px; border-radius: 24px; margin-top: 24px; position: relative; overflow: hidden; animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-    .reuse.celebrate { animation: pulseRing 1.5s infinite cubic-bezier(0.16, 1, 0.3, 1); }
-    .reuse .big-check { height: 56px; width: 56px; border-radius: 50%; background: var(--green); color: white; display: grid; place-items: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); }
-    .reuse .big-check svg { width: 32px; height: 32px; }
-    .reuse h2 { color: #064e3b; margin: 0 0 8px; }
-    .reuse p { color: #065f46; margin: 0 0 20px; font-size: 15px; font-weight: 500; }
-    .use-button { background: var(--green); box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2); }
-    .use-button:hover { background: #15803d; box-shadow: 0 6px 16px rgba(22, 163, 74, 0.3); }
-    
-    .fallback { display: none; margin-top: 24px; border-top: 1px solid var(--line); padding-top: 24px; animation: fadeIn 0.3s ease; }
-    .appdone { display: none; margin-top: 24px; background: var(--pale); color: #166534; border: 1.5px solid #86efac; border-radius: 16px; padding: 24px; animation: popIn 0.4s ease; font-weight: 500;}
-    
-    .consent-hero { background: #f0fdfa; border: 1px solid #5eead4; border-radius: 20px; padding: 24px; margin-bottom: 24px; }
-    .consent-hero h2 { color: #0f766e; }
-    .consent-hero p { margin: 8px 0 0; color: #115e59; font-size: 15px; font-weight: 500; }
-    
-    .consent-row { display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center; border-bottom: 1px solid var(--line); padding: 20px 0; animation: slideUp 0.3s ease; }
-    .consent-row:last-child { border: 0; padding-bottom: 0; }
-    .consent-icon { height: 44px; width: 44px; border-radius: 50%; background: #dcfce7; color: var(--green); display: grid; place-items: center; }
-    .consent-icon svg { width: 22px; height: 22px; }
-    .consent-row p { margin: 4px 0 0; font-size: 14px; color: var(--muted); line-height: 1.5; }
-    .consent-row b { color: var(--navy); font-size: 15px; }
-    .date { font-size: 13px; font-weight: 600; color: var(--muted); text-align: right; background: #f1f5f9; padding: 6px 10px; border-radius: 12px; }
-    
-    .empty { padding: 40px 20px; color: var(--muted); text-align: center; }
-    .empty svg { width: 48px; height: 48px; color: #cbd5e1; margin-bottom: 16px; }
-    
-    .privacy { display: flex; gap: 16px; background: #f8fafc; padding: 20px; border-radius: 16px; color: var(--ink); font-size: 14px; border: 1px solid var(--line); line-height: 1.6; }
-    .privacy svg { width: 20px; height: 20px; color: var(--navy); flex-shrink: 0; margin-top: 2px;}
-    .privacy b { display: block; color: var(--navy); margin-bottom: 4px; font-size: 15px; }
-    
-    .choice { text-align: center; background: #f8fafc; border: 1px solid var(--line); border-radius: 16px; padding: 32px 24px; margin: 0 0 20px; }
-    .choice p.sub { margin: 8px 0 24px; }
-    .choice .secondary { background: transparent; border: 0; text-decoration: underline; padding: 12px; margin-top: 12px; width: auto; color: var(--muted); }
-    .choice .secondary:hover { color: var(--navy); background: transparent; }
-    
-    .fetched { font-size: 12px; color: #166534; background: #dcfce7; padding: 4px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; animation: popIn 0.3s ease; }
-    .fetched svg { width: 12px; height: 12px; }
-    
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
-    .chip { padding: 6px 12px; border-radius: 16px; background: #dcfce7; color: #166534; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-    .chip svg { width: 14px; height: 14px; }
-    
-    .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 99; opacity: 0; transition: opacity 0.3s ease; }
-    .modal.show { opacity: 1; display: flex; }
-    .dialog { background: #fff; width: 100%; max-width: 480px; border-radius: 24px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    .modal.show .dialog { transform: translateY(0); }
-    .dialog h2 { margin-top: 12px; }
-    .dialog p { color: var(--ink); line-height: 1.6; margin-bottom: 24px; font-size: 15px;}
-    .dialog-actions { display: flex; gap: 12px; margin-top: 24px; }
-    .dialog-actions button { width: auto; flex: 1; }
-    
-    .offline-note { display: none; background: #fef3c7; color: #92400e; padding: 14px 16px; border-radius: 14px; margin-bottom: 24px; font-weight: 600; font-size: 14px; border: 1px solid #fde68a; align-items: center; gap: 10px; }
-    
-    .csc-banner { background: #eff6ff; color: #1e40af; padding: 20px; border-radius: 16px; margin-bottom: 24px; border: 1px solid #bfdbfe; line-height: 1.6; font-weight: 500; font-size: 15px;}
-    .digilocker { margin-top: 24px; background: #f8fafc; border: 1px solid var(--line); border-radius: 16px; padding: 20px; color: var(--muted); font-size: 14px; line-height: 1.6; }
-    .digilocker b { display: flex; align-items: center; gap: 6px; color: var(--navy); margin-bottom: 6px; font-size: 15px; }
-    
-    /* Toast */
-    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--navy); color: #fff; padding: 14px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 100; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; }
-    #toast.show { transform: translateX(-50%) translateY(0); }
-    #toast.success { background: #166534; }
-
-    /* Comparison Block */
-    .comp-block { border-radius: 16px; padding: 16px 20px; margin-bottom: 12px; border: 1px solid; line-height: 1.5;}
-    .comp-1 { background: #fef2f2; border-color: #fecaca; }
-    .comp-1 b { color: #b91c1c; display: block; margin-bottom: 4px; font-size: 15px;}
-    .comp-1 p { color: #991b1b; margin: 0; font-size: 14px;}
-    .comp-2 { background: #fef3c7; border-color: #fde68a; }
-    .comp-2 b { color: #b45309; display: block; margin-bottom: 4px; font-size: 15px;}
-    .comp-2 p { color: #92400e; margin: 0; font-size: 14px;}
-    .comp-3 { background: #f0fdf4; border-color: #bbf7d0; }
-    .comp-3 b { color: #15803d; display: block; margin-bottom: 4px; font-size: 15px;}
-    .comp-3 p { color: #166534; margin: 0; font-size: 14px;}
-    
-    /* Technical Detail & Validating */
-    .tech-panel { margin-top: 16px; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; }
-    .tech-panel-header { background: #f8fafc; padding: 12px 16px; font-size: 14px; font-weight: 600; color: var(--navy); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-    .tech-panel-header:hover { background: #f1f5f9; }
-    .tech-panel-content { display: none; padding: 16px; background: #fff; border-top: 1px solid #cbd5e1; font-family: monospace; font-size: 12px; color: var(--muted); word-break: break-all; }
-    .tech-panel.open .tech-panel-content { display: block; }
-    .revoke-btn { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.2s; display: inline-block;}
-    .revoke-btn:hover { background: #fee2e2; }
-    .validating-step { display: none; margin: 16px 0; font-size: 15px; color: var(--teal); font-weight: 600; align-items: center; gap: 8px; }
-    .validating-step .spinner { height: 20px; width: 20px; border-width: 3px; margin: 0; border-top-color: var(--teal); }
-
-    @media(max-width: 700px) {
-      .shell { padding: 0 16px 32px; }
-      .hero { border-radius: 20px; padding: 32px 24px; }
-      .hero h1 { font-size: 32px; }
-      .layout { grid-template-columns: 1fr; }
-      .card { padding: 24px; }
-      .trust { display: none; }
-      .consent-row { grid-template-columns: 40px 1fr; gap: 12px; }
-      .date { grid-column: 2; text-align: left; display: inline-block; width: max-content; margin-top: 4px; }
-      .dialog-actions { flex-direction: column; }
-      .tab { padding: 12px; font-size: 14px; }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
  <main class="shell">
@@ -248,20 +19,20 @@
       <span class="mark"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
       VerifyOnce
     </div>
-    <div style="display: flex; gap: 10px;">
+    <div class="header-actions">
       <button class="lang" id="offlineToggle"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg> Online</button> 
       <button class="lang" id="langToggle">हिंदी</button>
     </div>
   </header>
 
-  <div class="offline-note" id="offlineNote" style="display:none; flex-direction: column; align-items: flex-start; margin-bottom: 24px;">
-    <div style="display:flex; align-items:center; gap: 10px;">
+  <div class="offline-note offline-note-box" id="offlineNote">
+    <div class="offline-note-header">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20"></path><path d="M8.53 8.53C5.52 10.33 3 13.53 3 17"></path><path d="M14 14c-1.63 0-3.03.65-4.05 1.7"></path><path d="M11 21A1 1 0 0 0 13 21"></path><path d="M20.25 14C21 14.88 21 15.9 21 17"></path><path d="M18.15 8.15C19.95 10.15 21 12.87 21 16"></path><path d="M4.64 4.64C7 2.45 10.22 1 13.88 1c4.87 0 9 2.58 11.45 6.45"></path></svg>
       Offline mode: actions are saved locally and will sync when online.
     </div>
-    <div id="offlineQueueContainer" style="display:none; margin-top: 12px; width: 100%;">
-      <strong style="font-size: 13px; color: #78350f;">Pending sync:</strong>
-      <ul id="offlineQueueList" style="margin: 6px 0 0; padding-left: 20px; font-size: 13px; color: #92400e;"></ul>
+    <div id="offlineQueueContainer" class="offline-queue-container hidden">
+      <strong class="queue-title">Pending sync:</strong>
+      <ul id="offlineQueueList" class="queue-list"></ul>
     </div>
   </div>
   
@@ -269,7 +40,7 @@
     <svg class="bg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
     <p class="eyebrow">Verify once. Reuse everywhere.</p>
     <h1>Verify once. Apply faster. Stay accountable.</h1>
-    <p>DigiLocker stores your documents. VerifyOnce stores your trust.<br><span style="font-size:16px; color:#dbeafe;">No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</span></p>
+    <p>DigiLocker stores your documents. VerifyOnce stores your trust.<br><span class="hero-sub-text">No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</span></p>
     
     <div class="stats-bar">
       <div class="stat-card">
@@ -285,7 +56,7 @@
         <span>re-uploads, reused instantly</span>
       </div>
     </div>
-    <small style="display:block;margin-top:12px;color:#93c5fd;font-size:12px;">*Illustrative/estimated figures for demo purposes</small>
+    <small class="hero-disclaimer">*Illustrative/estimated figures for demo purposes</small>
   </section>
   
   <nav class="tabs">
@@ -350,23 +121,23 @@
 
           <!-- STEP 2: OTP -->
           <div id="step2" class="step-container">
-            <button class="back-btn" type="button" onclick="goToStep(1)">
+            <button class="back-btn" type="button" data-goto="1">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back
             </button>
             <div class="field">
               <label for="otp">Enter OTP</label>
               <input id="otp" inputmode="numeric" placeholder="Enter 123456">
-              <small style="color:var(--muted);display:block;margin-top:8px">Demo OTP: 123456</small>
+              <small class="otp-hint">Demo OTP: 123456</small>
             </div>
           </div>
 
           <!-- STEP 3: Choice -->
           <div id="step3" class="step-container">
-            <button class="back-btn" type="button" onclick="goToStep(1)">
+            <button class="back-btn" type="button" data-goto="1">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back
             </button>
             <div class="choice">
-              <h3 style="color:var(--navy);font-size:18px">Save time with your verified records</h3>
+              <h3 class="choice-heading">Save time with your verified records</h3>
               <p class="sub">Use DigiLocker to fill your details automatically.</p>
               <button class="primary" type="button" id="fetchDigi">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
@@ -378,7 +149,7 @@
 
           <!-- STEP 4: Manual or Fetched Data -->
           <div id="step4" class="step-container">
-            <button class="back-btn" type="button" onclick="goToStep(3)">
+            <button class="back-btn" type="button" data-goto="3">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back
             </button>
             
@@ -425,7 +196,7 @@
                 <input id="addressText" placeholder="Enter your address">
               </div>
               
-              <div class="field" style="margin-top: 24px;">
+              <div class="field mt-24">
                 <label>
                   Official Documents 
                   <span class="fetched" id="docsBadge">
@@ -433,26 +204,26 @@
                     Fetched from DigiLocker
                   </span>
                 </label>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
-                  <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" color="#2563eb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/></svg>
+                <div class="docs-grid">
+                  <div class="doc-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/></svg>
                     <div>
-                      <b style="font-size:14px; color:var(--navy); display:block; line-height:1.2;">Aadhaar Card</b>
-                      <span style="font-size:12px; color:var(--muted);">UIDAI</span>
+                      <b class="doc-title">Aadhaar Card</b>
+                      <span class="doc-sub">UIDAI</span>
                     </div>
                   </div>
-                  <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" color="#2563eb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  <div class="doc-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <div>
-                      <b style="font-size:14px; color:var(--navy); display:block; line-height:1.2;">PAN Record</b>
-                      <span style="font-size:12px; color:var(--muted);">Income Tax Dept</span>
+                      <b class="doc-title">PAN Record</b>
+                      <span class="doc-sub">Income Tax Dept</span>
                     </div>
                   </div>
-                  <div style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:12px; display:flex; align-items:center; gap:12px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" color="#2563eb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="14.5" r="2.5"></circle><path d="M16 11v6"></path><path d="M19 11v6"></path></svg>
+                  <div class="doc-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="14.5" r="2.5"></circle><path d="M16 11v6"></path><path d="M19 11v6"></path></svg>
                     <div>
-                      <b style="font-size:14px; color:var(--navy); display:block; line-height:1.2;">Driving License</b>
-                      <span style="font-size:12px; color:var(--muted);">MoRTH</span>
+                      <b class="doc-title">Driving License</b>
+                      <span class="doc-sub">MoRTH</span>
                     </div>
                   </div>
                 </div>
@@ -494,13 +265,13 @@
           </div>
           <p>Verification is valid for 90 days. Other services must ask for your consent before using it.</p>
           <div class="tech-panel" id="techPanel">
-            <div class="tech-panel-header" onclick="this.parentElement.classList.toggle('open')">
+            <div class="tech-panel-header" id="techPanelHeader">
               <span>View verification proof (Technical detail)</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="tech-panel-content">
-              <div style="margin-bottom:8px; font-family: 'Inter', sans-serif; font-size:13px; color: var(--navy); font-weight:600;">Signed by Ration Portal · Tamper-proof · Expires in 90 days.</div>
-              <span id="jwtToken" style="color:#2563eb"></span>
+              <div class="tech-note">Signed by Ration Portal · Tamper-proof · Expires in 90 days.</div>
+              <span id="jwtToken" class="jwt-token"></span>
             </div>
           </div>
         </div>
@@ -511,7 +282,7 @@
           <i><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></i>
           <div>
             <h3>Shared verification vault</h3>
-            <span style="color:var(--muted);font-size:14px;font-weight:500;">Connected across government services</span>
+            <span class="vault-sub">Connected across government services</span>
           </div>
         </div>
         <div class="vault-stat">
@@ -521,21 +292,21 @@
         <div class="how">
           <div>
             <span class="number">1</span>
-            <span><b>This portal verifies</b><br><span style="color:var(--muted);font-size:14px">Documents are checked one time.</span></span>
+            <span><b>This portal verifies</b><br><span class="how-sub">Documents are checked one time.</span></span>
           </div>
           <div>
             <span class="number">2</span>
-            <span><b>Vault stores the proof</b><br><span style="color:var(--muted);font-size:14px">Not a copy for every portal.</span></span>
+            <span><b>Vault stores the proof</b><br><span class="how-sub">Not a copy for every portal.</span></span>
           </div>
           <div>
             <span class="number">3</span>
-            <span><b>You give consent</b><br><span style="color:var(--muted);font-size:14px">Each reuse is visible in your log.</span></span>
+            <span><b>You give consent</b><br><span class="how-sub">Each reuse is visible in your log.</span></span>
           </div>
         </div>
         <div class="digilocker">
           <b><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> DigiLocker-ready integration</b>
           In a production rollout, this vault would use DigiLocker/API Setu after approved partner onboarding. This demo simulates that secure consent handoff.
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 12px 0;">
+          <hr class="digilocker-hr">
           Each verification is a signed, expiring credential — not a shared password or copied document. This is the same model used in verifiable credentials (W3C VC standard).
         </div>
         <div class="note">
@@ -559,8 +330,8 @@
         
         <div class="sample">
           <strong>Try the reuse moment</strong>
-          <p>Pre-verified sample citizen: <b style="color:var(--navy)">Meera Patel · 9876543210</b></p>
-          <button class="secondary" id="trySample" style="width:auto">Use sample number</button>
+          <p>Pre-verified sample citizen: <b class="citizen-highlight">Meera Patel · 9876543210</b></p>
+          <button class="secondary btn-auto" id="trySample">Use sample number</button>
         </div>
         
         <div class="field">
@@ -580,19 +351,19 @@
           </div>
           <h2>Already verified elsewhere</h2>
           <p id="reuseText"></p>
-          <b style="color:#064e3b;font-size:14px">Only these facts will be shared:</b>
+          <b class="reuse-facts-title">Only these facts will be shared:</b>
           <div class="chips">
             <span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Identity verified</span>
             <span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Address verified</span>
             <span class="chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Validity date</span>
           </div>
-          <small style="display:block;margin-bottom:16px;color:#059669;font-weight:500;">Your Aadhaar number and uploaded files will not be shared.</small>
+          <small class="reuse-privacy">Your Aadhaar number and uploaded files will not be shared.</small>
           <button class="primary use-button" id="useIdentity">Review and use verified identity</button>
         </div>
         
         <div class="fallback" id="fallback">
           <h3 id="fallbackTitle">Identity not found in shared vault</h3>
-          <p class="sub" id="fallbackSub" style="margin:6px 0 20px">Please upload your Aadhaar and address proof to continue.</p>
+          <p class="sub fallback-sub" id="fallbackSub">Please upload your Aadhaar and address proof to continue.</p>
           <div class="field">
             <label class="file">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -608,8 +379,8 @@
         </div>
         
         <div class="appdone" id="appDone">
-          <span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;">
-            <svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span class="cert-done-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             Documents verified
           </span>
           Your scholarship application can now proceed to the next step.
@@ -633,11 +404,11 @@
           <p>No typing and no re-verification — one tap, done forever.</p>
         </div>
         
-        <div class="privacy" style="margin-top:24px">
+        <div class="privacy mt-24">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           <div>
             <b>You stay in control</b>
-            <span style="color:var(--muted)">The consent log shows exactly when a portal reused your verification.</span>
+            <span class="vault-sub">The consent log shows exactly when a portal reused your verification.</span>
           </div>
         </div>
       </aside>
@@ -647,59 +418,59 @@
   <!-- PORTAL C: PDS (RURAL) -->
   <section id="pds" class="view">
     <div class="layout">
-      <article class="card" style="padding: 32px; border: 2px solid #fde68a;">
-        <span class="portal-tag" style="background:#fef3c7; color:#92400e;">
+      <article class="card pds-card">
+        <span class="portal-tag pds-tag">
           🌾 Service portal · PDS (Rural)
         </span>
-        <h2 style="font-size: 28px; margin-bottom: 12px;">Get your Ration</h2>
-        <p class="sub" style="font-size: 17px; margin-bottom: 32px;">Fast verification optimized for low network areas. No re-uploads, no re-checks, ever.</p>
+        <h2 class="pds-title">Get your Ration</h2>
+        <p class="sub pds-sub">Fast verification optimized for low network areas. No re-uploads, no re-checks, ever.</p>
         
-        <div class="sample" style="background:#fefce8; border-color:#fde047; padding:24px;">
-          <strong style="color:#854d0e; font-size:18px;">Try the reuse moment</strong>
-          <p style="color:#a16207; font-size:16px;">Pre-verified sample citizen: <b style="color:#713f12">Meera Patel · 9876543210</b></p>
-          <button class="secondary" id="pdsTrySample" style="width:auto; padding:16px 20px; font-size:16px; border-color:#facc15;">Use sample number</button>
+        <div class="sample pds-sample">
+          <strong class="pds-sample-title">Try the reuse moment</strong>
+          <p class="pds-sample-text">Pre-verified sample citizen: <b class="pds-citizen-name">Meera Patel · 9876543210</b></p>
+          <button class="secondary pds-sample-btn" id="pdsTrySample">Use sample number</button>
         </div>
         
-        <div class="field" style="margin-top: 32px;">
-          <label for="pPhone" style="font-size: 16px;">Citizen Phone Number</label>
-          <input id="pPhone" inputmode="numeric" placeholder="Enter 10-digit number" style="padding: 20px; font-size: 20px;">
+        <div class="field pds-field">
+          <label for="pPhone" class="pds-label">Citizen Phone Number</label>
+          <input id="pPhone" inputmode="numeric" placeholder="Enter 10-digit number" class="pds-input">
         </div>
-        <button class="primary" id="pdsCheckVault" style="padding: 20px; font-size: 18px; background:#ca8a04;">Check Verified Identity</button>
+        <button class="primary pds-check-btn" id="pdsCheckVault">Check Verified Identity</button>
         
         <div class="loading" id="pdsVerifying">
-          <div class="spinner" style="border-top-color:#ca8a04;"></div>
-          <span id="pdsLoadMsg" style="font-size:18px;">Connecting slowly... Please wait...</span>
+          <div class="spinner pds-spinner"></div>
+          <span id="pdsLoadMsg" class="pds-load-msg">Connecting slowly... Please wait...</span>
         </div>
 
-        <div class="reuse" id="pdsReuseBanner" style="margin-top: 32px; padding:32px; background:#fefce8; border-color:#facc15;">
-          <div class="big-check" style="background:#ca8a04;">
+        <div class="reuse pds-reuse-banner" id="pdsReuseBanner">
+          <div class="big-check pds-big-check">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           </div>
-          <h2 style="font-size: 24px; color:#854d0e;">Found Verified Record</h2>
-          <p id="pdsReuseText" style="font-size: 16px; color:#a16207;"></p>
-          <button class="primary use-button" id="pdsUseIdentity" style="padding: 20px; font-size: 18px; background:#ca8a04; box-shadow:none;">Use Identity Now</button>
+          <h2 class="pds-reuse-title">Found Verified Record</h2>
+          <p id="pdsReuseText" class="pds-reuse-text"></p>
+          <button class="primary use-button pds-use-btn" id="pdsUseIdentity">Use Identity Now</button>
         </div>
         
         <div class="fallback" id="pdsFallback">
-          <h3 id="pdsFallbackTitle" style="font-size:20px;">No identity found.</h3>
-          <p id="pdsFallbackSub" style="font-size:16px;">Cannot proceed without documents.</p>
+          <h3 id="pdsFallbackTitle" class="pds-fallback-title">No identity found.</h3>
+          <p id="pdsFallbackSub" class="pds-fallback-sub">Cannot proceed without documents.</p>
         </div>
         
-        <div class="appdone" id="pdsDone" style="font-size: 18px; padding: 24px; border-color:#fde047; background:#fefce8;">
-          <span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:22px;margin-bottom:8px; color:#854d0e;">
-            <svg style="color:#ca8a04" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <div class="appdone pds-done" id="pdsDone">
+          <span class="pds-done-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             Done!
           </span>
-          <span style="color:#a16207;">Identity used successfully. Proceed to collect rations.</span>
+          <span class="pds-done-text">Identity used successfully. Proceed to collect rations.</span>
         </div>
       </article>
 
       <aside class="card">
         <h2>Works everywhere</h2>
         <p class="sub">This simulates a rural portal designed for low-connectivity environments.</p>
-        <div class="comp-block comp-3" style="background:#fefce8; border-color:#fde047;">
-          <b style="color:#854d0e;">Zero re-uploads</b>
-          <p style="color:#a16207;">Since the identity is fetched locally or through a lightweight payload, it completely bypasses the need for megabytes of document uploads, working flawlessly even on 2G connections.</p>
+        <div class="comp-block comp-3 pds-comp">
+          <b class="pds-comp-title">Zero re-uploads</b>
+          <p class="pds-comp-text">Since the identity is fetched locally or through a lightweight payload, it completely bypasses the need for megabytes of document uploads, working flawlessly even on 2G connections.</p>
         </div>
       </aside>
     </div>
@@ -716,10 +487,10 @@
         <h2>Apply for Certificate</h2>
         <p class="sub">Verify your identity instantly and track your application status strictly.</p>
 
-        <div class="sample" style="margin-bottom: 24px;">
+        <div class="sample cert-sample">
           <strong>Try the reuse moment</strong>
-          <p>Pre-verified sample citizen: <b style="color:var(--navy)">Meera Patel · 9876543210</b></p>
-          <button class="secondary" onclick="byId('cPhone').value='9876543210'; byId('cCheckVault').click()" style="width:auto">Use sample number</button>
+          <p>Pre-verified sample citizen: <b class="citizen-highlight">Meera Patel · 9876543210</b></p>
+          <button class="secondary btn-auto" id="certTrySample">Use sample number</button>
         </div>
 
         <div id="certStep1">
@@ -734,25 +505,25 @@
             Validating signature ✓
           </div>
           
-          <div class="fallback" id="cFallback" style="display:none; margin-top:24px;">
-            <h3 style="color:#ef4444">Identity not found</h3>
+          <div class="fallback cert-fallback" id="cFallback">
+            <h3 class="text-danger">Identity not found</h3>
             <p>Please complete verification first.</p>
           </div>
         </div>
 
-        <div id="certStep2" style="display:none; animation: slideUp 0.3s ease;">
-          <div class="appdone" style="display:block; margin: 0 0 24px 0; border-color:var(--blue); background:#eff6ff;">
-            <span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px; color:var(--blue);">
+        <div id="certStep2" class="cert-step-container hidden">
+          <div class="appdone cert-done">
+            <span class="cert-done-header">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
               Identity verified
             </span>
-            <span id="cIdentText" style="color:var(--navy); font-size:14px;"></span>
+            <span id="cIdentText" class="cert-ident-text"></span>
           </div>
 
           <form id="certForm">
             <div class="field">
               <label for="certType">Certificate Type</label>
-              <select id="certType" style="width:100%; padding:14px 16px; border-radius:12px; border:1.5px solid #cbd5e1; font:inherit; color:var(--navy); background:#f8fafc;">
+              <select id="certType">
                 <option value="Income Certificate">Income Certificate</option>
                 <option value="Caste Certificate">Caste Certificate</option>
                 <option value="Domicile Certificate">Domicile Certificate</option>
@@ -766,40 +537,40 @@
           </form>
         </div>
 
-        <div id="certStep3" style="display:none; animation: slideUp 0.3s ease;">
+        <div id="certStep3" class="cert-step-container hidden">
           <h3 style="margin-bottom:16px;">Application Status</h3>
-          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:16px; padding:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-              <span style="color:var(--muted); font-size:14px; font-weight:600;">App ID: <b style="color:var(--navy)" id="cAppId"></b></span>
-              <span style="color:var(--muted); font-size:14px; font-weight:600;" id="cDate"></span>
+          <div class="cert-status-card">
+            <div class="cert-status-header">
+              <span class="cert-status-label">App ID: <b id="cAppId" class="cert-app-id"></b></span>
+              <span class="cert-status-label" id="cDate"></span>
             </div>
             
-            <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:24px;">
-              <div style="display:flex; align-items:center; gap:12px;">
-                <div style="height:24px; width:24px; border-radius:50%; background:var(--green); color:white; display:grid; place-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-                <b style="color:var(--navy);">Filed successfully</b>
+            <div class="timeline-container">
+              <div class="timeline-item">
+                <div class="timeline-icon-success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+                <b class="citizen-highlight">Filed successfully</b>
               </div>
-              <div style="width:2px; height:20px; background:var(--line); margin-left:11px; margin-top:-12px; margin-bottom:-12px;"></div>
+              <div class="timeline-line"></div>
               
-              <div style="display:flex; align-items:center; gap:12px;" id="statusReview">
-                <div class="spinner" style="height:24px; width:24px; border-width:3px; border-top-color:var(--blue); margin:0;" id="reviewSpinner"></div>
-                <div style="height:24px; width:24px; border-radius:50%; background:#ef4444; color:white; display:none; place-items:center;" id="escalatedIcon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+              <div class="timeline-item" id="statusReview">
+                <div class="spinner timeline-spinner" id="reviewSpinner"></div>
+                <div class="timeline-icon-danger" id="escalatedIcon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
                 <div>
-                  <b style="color:var(--blue);" id="statusText">Under Review</b>
-                  <div style="font-size:13px; color:var(--muted);" id="statusSub">Awaiting official approval</div>
+                  <b class="status-text-under-review" id="statusText">Under Review</b>
+                  <div class="timeline-subtext" id="statusSub">Awaiting official approval</div>
                 </div>
               </div>
             </div>
 
-            <div style="background:#fefce8; border:1px solid #fde047; padding:16px; border-radius:12px;" id="slaBox">
-              <div style="display:flex; align-items:center; gap:8px; color:#854d0e; font-weight:700; margin-bottom:4px;">
+            <div class="sla-box" id="slaBox">
+              <div class="sla-header">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 SLA Countdown
               </div>
-              <div style="font-size:14px; color:#a16207; line-height:1.4;">Official deadline: 15 days. If not processed, auto-escalates to District Officer.</div>
-              <div style="font-size:20px; font-weight:800; color:#ca8a04; margin-top:8px; font-variant-numeric: tabular-nums;" id="slaTimer">15 days 00:00:00</div>
+              <div class="sla-desc">Official deadline: 15 days. If not processed, auto-escalates to District Officer.</div>
+              <div class="sla-timer" id="slaTimer">15 days 00:00:00</div>
               
-              <button class="secondary" style="margin-top:16px; padding:8px 12px; font-size:13px; width:auto; border-color:#facc15;" id="fastForwardBtn">Demo: Fast-forward 15 days</button>
+              <button class="secondary sla-btn" id="fastForwardBtn">Demo: Fast-forward 15 days</button>
             </div>
           </div>
         </div>
@@ -809,13 +580,13 @@
         <h2>Accountability built-in</h2>
         <p class="sub">VerifyOnce doesn't just speed up applications, it enforces government SLAs.</p>
         
-        <div class="comp-block comp-2" style="background:#f0fdfa; border-color:#99f6e4;">
-          <b style="color:#0f766e;">Auto-escalation</b>
-          <p style="color:#115e59;">If an application breaches its 15-day service guarantee, the system automatically marks it as escalated without the citizen needing to complain.</p>
+        <div class="comp-block comp-2">
+          <b>Auto-escalation</b>
+          <p>If an application breaches its 15-day service guarantee, the system automatically marks it as escalated without the citizen needing to complain.</p>
         </div>
-        <div class="comp-block comp-2" style="background:#eff6ff; border-color:#bfdbfe;">
-          <b style="color:#1e40af;">Public Transparency</b>
-          <p style="color:#1e3a8a;">Escalation logs provide clear audit trails, showing exactly when deadlines are missed.</p>
+        <div class="comp-block comp-2">
+          <b>Public Transparency</b>
+          <p>Escalation logs provide clear audit trails, showing exactly when deadlines are missed.</p>
         </div>
       </aside>
     </div>
@@ -823,9 +594,9 @@
 
   <!-- ESCALATION LOG -->
   <section id="escalations" class="view">
-    <div class="consent-hero" style="background:#fef2f2; border-color:#fca5a5;">
-      <h2 style="color:#b91c1c;">Escalation Log</h2>
-      <p style="color:#991b1b;">Track applications that exceeded their official SLA deadline and were automatically escalated.</p>
+    <div class="consent-hero escalation-hero">
+      <h2>Escalation Log</h2>
+      <p>Track applications that exceeded their official SLA deadline and were automatically escalated.</p>
     </div>
     <article class="card">
       <h2>SLA Breaches</h2>
@@ -840,7 +611,7 @@
       <h2>Your consent, clearly recorded</h2>
       <p>Every time a service uses an existing verification, it appears here. You can see where it came from and when it was shared.</p>
     </div>
-    <article class="card" style="margin-bottom: 24px;">
+    <article class="card mb-24">
       <h2>Active verifications</h2>
       <p class="sub">Manage your active verification proofs.</p>
       <div id="activeProofsList"></div>
@@ -867,7 +638,7 @@
           <input id="cscPhone" inputmode="numeric" placeholder="Enter 10-digit mobile number">
         </div>
         <button class="primary" id="cscLookup">Find verified identity</button>
-        <div class="appdone" id="cscResult" style="margin-top:20px;"></div>
+        <div class="appdone mt-20" id="cscResult"></div>
       </article>
       <aside class="card">
         <h2>Works in low-connectivity areas</h2>
@@ -876,7 +647,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
           <div>
             <b>Offline queue</b>
-            <span style="color:var(--muted)">Requests are saved locally, then automatically synchronised when the connection returns.</span>
+            <span class="vault-sub">Requests are saved locally, then automatically synchronised when the connection returns.</span>
           </div>
         </div>
       </aside>
@@ -886,8 +657,8 @@
 
  <!-- MODALS -->
  <div class="modal" id="cscCitizenModal">
-  <div class="dialog" style="border: 4px solid #334155; border-radius: 32px; padding: 24px; max-width: 320px;">
-    <div style="text-align: center; color: var(--muted); font-size: 13px; font-weight: 600; margin-bottom: 16px;">Simulated citizen device</div>
+  <div class="dialog csc-dialog">
+    <div class="csc-sim-header">Simulated citizen device</div>
     <span class="portal-tag">Consent request</span>
     <h2>Allow CSC Operator?</h2>
     <p>Operator wants to use your verified identity.</p>
@@ -917,7 +688,7 @@
       DigiLocker consent
     </span>
     <h2>Allow VerifyOnce to fetch details?</h2>
-    <p>VerifyOnce wants to fetch: <b style="color:var(--navy)">Identity details (Name, DOB, Address) and Official Documents (Aadhaar Card, PAN Card, Driving License)</b> from DigiLocker.</p>
+    <p>VerifyOnce wants to fetch: <b class="citizen-highlight">Identity details (Name, DOB, Address) and Official Documents (Aadhaar Card, PAN Card, Driving License)</b> from DigiLocker.</p>
     <div class="dialog-actions">
       <button class="secondary" id="denyDigi">Deny</button>
       <button class="primary" id="allowDigi">Allow</button>
@@ -931,707 +702,6 @@
    <span id="toastMsg">Success</span>
  </div>
 
- <script>
-  // Setup & Utils
-  
-  function escapeHTML(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>'"]/g, tag => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[tag] || tag));
-  }
-
-  // DEMO ONLY: Simulated JWT generation. Do not use in production. No real secrets here.
-  function generateMockJWT(payload) {
-    const header = btoa(JSON.stringify({alg:"HS256",typ:"JWT"}));
-    const data = btoa(JSON.stringify(payload));
-    const sig = btoa("mock-signature-" + Date.now()).substring(0, 43);
-    return `${header}.${data}.${sig}`;
-  }
-
-  const seedExpiry = new Date(Date.now() + 90 * 86400000);
-  const seed = {
-    name:'Meera Patel', phone:'9876543210', 
-    verifiedAt: Date.now() - 86400000 * 2, 
-    validUntil: seedExpiry.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}), 
-    verifiedBy:'Ration Card Portal', 
-    documents:['Aadhaar','Address proof']
-  };
-  seed.proofToken = generateMockJWT({
-    citizen_id: seed.phone,
-    verified_by: seed.verifiedBy,
-    verified_at: seed.verifiedAt,
-    expires_at: seedExpiry.getTime()
-  });
-  
-  let vault = JSON.parse(localStorage.getItem('verifyOnceVault')||'null') || [seed]; 
-  let consentLog = JSON.parse(localStorage.getItem('verifyOnceConsent')||'null') || [];
-  
-  const byId = id => document.getElementById(id);
-  const persist = () => { localStorage.setItem('verifyOnceVault', JSON.stringify(vault)); localStorage.setItem('verifyOnceConsent', JSON.stringify(consentLog)); byId('vaultCount').textContent = vault.length; };
-  const showToast = (msg, isSuccess=true) => { const t = byId('toast'); byId('toastMsg').textContent = msg; t.className = isSuccess?'success show':'show'; setTimeout(()=>t.className='', 3000); };
-  
-  // Format dates elegantly
-  const formatTime = (ts) => {
-    const diff = Math.floor((Date.now() - ts) / 60000); // mins
-    if(diff < 1) return 'Just now';
-    if(diff < 60) return `${diff} min${diff>1?'s':''} ago`;
-    if(diff < 1440) { const h = Math.floor(diff/60); return `${h} hr${h>1?'s':''} ago`; }
-    return new Date(ts).toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'});
-  };
-
-  // Tabs
-  document.querySelectorAll('.tab').forEach(tab => tab.onclick = () => {
-    document.querySelectorAll('.tab, .view').forEach(x => x.classList.remove('active'));
-    tab.classList.add('active');
-    byId(tab.dataset.view).classList.add('active');
-    if(tab.dataset.view === 'consent') renderConsent();
-  });
-
-  // File Inputs
-  [['aadhaar','aadhaarName'],['address','addressName']].forEach(([input,text]) => {
-    byId(input).onchange = e => byId(text).textContent = e.target.files[0]?.name || 'Upload a mock image or PDF';
-  });
-
-  // Flow logic (Portal A)
-  let currentStep = 1;
-  const goToStep = (step) => {
-    document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
-    byId(`step${step}`).classList.add('active');
-    currentStep = step;
-    const pBar = byId('pBar');
-    const label = byId('stepLabel');
-    if(step===1) { pBar.style.width = '33%'; label.textContent = 'Step 1 of 3: Phone number'; }
-    if(step===2) { pBar.style.width = '66%'; label.textContent = 'Step 2 of 3: Verify OTP'; }
-    if(step===3) { pBar.style.width = '80%'; label.textContent = 'Step 3 of 3: Verification method'; }
-    if(step===4) { pBar.style.width = '100%'; label.textContent = 'Step 3 of 3: Complete verification'; }
-  };
-
-  let isSendingOtp = false;
-  byId('sendOtp').onclick = () => {
-    if (isSendingOtp) return;
-    isSendingOtp = true;
-    setTimeout(() => { isSendingOtp = false; }, 2000);
-    const phone = byId('rPhone').value.trim();
-    if(!/^\d{10}$/.test(phone)) {
-      byId('rPhone').classList.add('error');
-      byId('phoneError').style.display = 'block';
-      return;
-    }
-    byId('rPhone').classList.remove('error');
-    byId('phoneError').style.display = 'none';
-    goToStep(2);
-    showToast('OTP sent successfully');
-  };
-
-  byId('otp').oninput = () => { if(byId('otp').value === '123456') goToStep(3); };
-
-  byId('fetchDigi').onclick = () => {
-    byId('digiModal').classList.add('show');
-  };
-  
-  byId('denyDigi').onclick = () => {
-    byId('digiModal').classList.remove('show');
-    byId('manualEntry').click();
-  };
-  
-  byId('manualEntry').onclick = () => {
-    goToStep(4);
-    byId('extraFields').classList.add('hidden');
-    byId('manualUploads').classList.remove('hidden');
-    byId('aadhaar').required = true;
-    byId('address').required = true;
-    
-    // Clear fetched data if any
-    byId('rName').value = '';
-    if(byId('aadhaarNum')) byId('aadhaarNum').value = '';
-    ['nameBadge','dobBadge','addressBadge'].forEach(id => byId(id).classList.add('hidden'));
-    if(byId('aadhaarNumBadge')) byId('aadhaarNumBadge').classList.add('hidden');
-  };
-
-  byId('allowDigi').onclick = () => {
-    byId('digiModal').classList.remove('show');
-    byId('rationForm').classList.add('hidden');
-    byId('rProgress').classList.add('hidden');
-    
-    const ver = byId('verifying');
-    ver.style.display = 'block';
-    byId('loadMsg').textContent = ' Fetching from DigiLocker…';
-    
-    setTimeout(() => {
-      goToStep(4);
-      byId('rName').value = 'Anjali Sharma';
-      byId('aadhaarNum').value = 'XXXX XXXX 8912';
-      byId('dob').value = '1996-04-18';
-      byId('addressText').value = '12, Shanti Nagar, Pune, Maharashtra';
-      
-      ['nameBadge','aadhaarNumBadge','dobBadge','addressBadge'].forEach(id => byId(id).classList.remove('hidden'));
-      byId('manualUploads').classList.add('hidden');
-      byId('extraFields').classList.remove('hidden');
-      
-      byId('aadhaar').required = false;
-      byId('address').required = false;
-      
-      ver.style.display = 'none';
-      byId('rationForm').classList.remove('hidden');
-      byId('rProgress').classList.remove('hidden');
-      
-      showToast('Details fetched securely');
-    }, 2000);
-  };
-
-  // Submit Portal A
-  byId('rationForm').onsubmit = e => {
-    e.preventDefault();
-    byId('rationForm').classList.add('hidden');
-    byId('rProgress').classList.add('hidden');
-    
-    const ver = byId('verifying');
-    ver.style.display = 'block';
-    byId('loadMsg').textContent = ' Checking documents securely…';
-    
-    setTimeout(() => {
-      const phone_val = byId('rPhone').value.trim();
-      const isDigilocker = !byId('extraFields').classList.contains('hidden');
-      const docs_val = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
-      
-      const expiry = new Date(Date.now() + 90 * 86400000);
-      const newPerson = {
-        name: byId('rName').value.trim(),
-        phone: phone_val,
-        verifiedAt: Date.now(),
-        validUntil: expiry.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}),
-        verifiedBy: 'Ration Card Portal',
-        documents: docs_val
-      };
-      
-      const token = generateMockJWT({
-        citizen_id: phone_val,
-        verified_by: newPerson.verifiedBy,
-        verified_at: newPerson.verifiedAt,
-        expires_at: expiry.getTime()
-      });
-      newPerson.proofToken = token;
-      
-      const action = () => {
-        vault = vault.filter(v => v.phone !== phone_val);
-        vault.push(newPerson);
-        persist();
-      };
-
-      if (offline) {
-        addOfflineAction('Verify identity for ' + newPerson.name, action);
-      } else {
-        action();
-      }
-      
-      byId('jwtToken').textContent = token;
-      
-      ver.style.display = 'none';
-      byId('rationSuccess').style.display = 'block';
-      showToast('Identity verified and saved to vault');
-    }, 2000);
-  };
-
-  // Portal B
-  byId('trySample').onclick = () => { byId('sPhone').value = seed.phone; checkVault(); };
-  byId('checkVault').onclick = checkVault;
-
-  // Portal C (PDS)
-  byId('pdsTrySample').onclick = () => { byId('pPhone').value = seed.phone; checkPdsVault(); };
-  byId('pdsCheckVault').onclick = checkPdsVault;
-
-  function checkPdsVault() {
-    const phone = byId('pPhone').value.trim();
-    if(!phone) { byId('pPhone').focus(); return; }
-    
-    // Simulate low bandwidth
-    byId('pdsReuseBanner').style.display = 'none';
-    byId('pdsFallback').style.display = 'none';
-    byId('pdsDone').style.display = 'none';
-    byId('pdsVerifying').style.display = 'block';
-    byId('pdsCheckVault').style.display = 'none';
-
-    setTimeout(() => {
-      byId('pdsVerifying').style.display = 'none';
-      
-      const person = vault.find(v => v.phone === phone);
-      if(person) {
-        if(person.revoked) {
-          byId('pdsCheckVault').style.display = 'inline-flex';
-          byId('pdsFallbackTitle').textContent = 'Verification revoked';
-          byId('pdsFallbackSub').textContent = 'Verification revoked — please re-verify.';
-          byId('pdsFallback').style.display = 'block';
-          return;
-        }
-        
-        const validating = document.createElement('div');
-        validating.className = 'validating-step';
-        validating.style.display = 'flex';
-        validating.style.margin = '0 0 24px 0';
-        validating.innerHTML = '<div class="spinner"></div> Validating signature ✓';
-        byId('pdsCheckVault').parentElement.insertBefore(validating, byId('pdsReuseBanner'));
-        
-        setTimeout(() => {
-          validating.remove();
-          byId('pdsCheckVault').style.display = 'inline-flex';
-          byId('pdsReuseText').innerHTML = `<b>${escapeHTML(person.name)}'s</b> identity was verified by <b>${escapeHTML(person.verifiedBy)}</b>.`;
-          const banner = byId('pdsReuseBanner');
-          banner.style.display = 'block';
-          banner.classList.remove('celebrate');
-          void banner.offsetWidth; 
-          banner.classList.add('celebrate');
-          byId('pdsUseIdentity').dataset.phone = phone;
-        }, 1000);
-      } else {
-        byId('pdsCheckVault').style.display = 'inline-flex';
-        byId('pdsFallbackTitle').textContent = 'No identity found.';
-        byId('pdsFallbackSub').textContent = 'Cannot proceed without documents.';
-        byId('pdsFallback').style.display = 'block';
-      }
-    }, 2500); // Slower fake loading
-  }
-
-  byId('pdsUseIdentity').onclick = () => {
-    const phone = byId('pdsUseIdentity').dataset.phone;
-    const person = vault.find(v => v.phone === phone);
-    const action = () => {
-      consentLog.unshift({
-        name: person.name, phone, usedBy: 'PDS Portal (Rural)', 
-        source: person.verifiedBy, date: Date.now(), 
-        scope: 'Verified identity'
-      });
-      persist();
-      renderConsent();
-    };
-    if (offline) {
-      addOfflineAction('PDS Consent for ' + person.name, action);
-    } else {
-      action();
-    }
-    byId('pdsReuseBanner').style.display = 'none';
-    byId('pdsDone').style.display = 'block';
-    showToast('Identity securely reused on low bandwidth');
-  };
-  
-  function checkVault() {
-    const phone = byId('sPhone').value.trim();
-    const person = vault.find(v => v.phone === phone);
-    
-    byId('reuseBanner').style.display = 'none';
-    byId('fallback').style.display = 'none';
-    byId('appDone').style.display = 'none';
-    
-    if(!phone) { byId('sPhone').focus(); return; }
-    
-    if(person) {
-      if(person.revoked) {
-        byId('fallbackTitle').textContent = 'Verification revoked';
-        byId('fallbackSub').textContent = 'Verification revoked — please re-verify.';
-        byId('fallback').style.display = 'block';
-        return;
-      }
-      
-      byId('sValidating').style.display = 'flex';
-      byId('checkVault').style.display = 'none';
-      
-      setTimeout(() => {
-        byId('sValidating').style.display = 'none';
-        byId('checkVault').style.display = 'inline-flex';
-        
-        byId('reuseText').innerHTML = `<b style="color:var(--navy)">${escapeHTML(person.name)}'s</b> identity was verified via <b>${escapeHTML(person.verifiedBy)}</b> on ${new Date(person.verifiedAt).toLocaleDateString('en-IN')}. Valid until ${escapeHTML(person.validUntil)}.`;
-        
-        const banner = byId('reuseBanner');
-        banner.style.display = 'block';
-        banner.classList.remove('celebrate');
-        void banner.offsetWidth; 
-        banner.classList.add('celebrate');
-        
-        byId('useIdentity').dataset.phone = phone;
-      }, 1000);
-    } else {
-      byId('fallbackTitle').textContent = 'Identity not found in shared vault';
-      byId('fallbackSub').textContent = 'Please upload your Aadhaar and address proof to continue.';
-      byId('fallback').style.display = 'block';
-    }
-  }
-
-  byId('useIdentity').onclick = () => byId('consentModal').classList.add('show');
-  byId('denyConsent').onclick = () => byId('consentModal').classList.remove('show');
-  
-  byId('allowConsent').onclick = () => {
-    const phone = byId('useIdentity').dataset.phone;
-    const person = vault.find(v => v.phone === phone);
-    
-    const action = () => {
-      consentLog.unshift({
-        name: person.name, phone, usedBy: 'Scholarship Portal', 
-        source: person.verifiedBy, date: Date.now(), 
-        scope: 'Identity verified, address verified, validity date'
-      });
-      persist();
-      renderConsent();
-    };
-    if (offline) {
-      addOfflineAction('Scholarship Consent for ' + person.name, action);
-    } else {
-      action();
-    }
-    
-    byId('consentModal').classList.remove('show');
-    byId('reuseBanner').style.display = 'none';
-    byId('appDone').style.display = 'block';
-    showToast('Consent granted for reuse');
-  };
-
-  // Consent Log
-  window.revokeVerification = function(phone) {
-    const person = vault.find(v => v.phone === phone);
-    if(person) {
-      person.revoked = true;
-      persist();
-      renderConsent();
-      showToast('Verification revoked successfully');
-    }
-  };
-
-  function renderConsent() {
-    const activeNode = byId('activeProofsList');
-    if(activeNode) {
-      const activeProofs = vault.filter(v => !v.revoked);
-      activeNode.innerHTML = activeProofs.length ? activeProofs.map(x => `
-        <div class="consent-row">
-          <div class="consent-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-          <div style="flex:1">
-            <b>${escapeHTML(x.verifiedBy)}</b>
-            <p>Verified on ${new Date(x.verifiedAt).toLocaleDateString('en-IN')} · Valid until ${escapeHTML(x.validUntil)}</p>
-            ${x.proofToken ? `<div style="font-family:monospace;font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all;">Token: ${escapeHTML(x.proofToken.substring(0,40))}...</div>` : ''}
-          </div>
-          <div>
-            <button class="revoke-btn" onclick="revokeVerification('${escapeHTML(x.phone)}')">Revoke my verification</button>
-          </div>
-        </div>
-      `).join('') : `
-        <div class="empty" style="padding:20px;">
-          <p style="margin:0;font-size:14px;color:var(--muted)">No active verifications found.</p>
-        </div>
-      `;
-    }
-
-    const node = byId('consentList');
-    node.innerHTML = consentLog.length ? consentLog.map(x => `
-      <div class="consent-row">
-        <div class="consent-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
-        <div>
-          <b>Your identity was shared with ${escapeHTML(x.usedBy)}</b>
-          <p>Using verification from ${escapeHTML(x.source)} · ${escapeHTML(x.scope) || 'Verified identity'} · ${escapeHTML(x.name)} (${escapeHTML(x.phone)})</p>
-        </div>
-        <span class="date">${formatTime(x.date)}</span>
-      </div>
-    `).join('') : `
-      <div class="empty">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <p style="font-size:16px;font-weight:500;color:var(--navy)">No identity reuse yet.</p>
-        <p>When you approve a portal to use your verified identity, it will appear here.</p>
-      </div>
-    `;
-  }
-
-  // Certificate Portal
-  let certAppInterval;
-  
-  byId('cCheckVault').onclick = () => {
-    const phone = byId('cPhone').value.trim();
-    const person = vault.find(v => v.phone === phone);
-    
-    byId('cFallback').style.display = 'none';
-    
-    if(!phone) { byId('cPhone').focus(); return; }
-    
-    if(person && !person.revoked) {
-      byId('cValidating').style.display = 'flex';
-      byId('cCheckVault').style.display = 'none';
-      
-      setTimeout(() => {
-        byId('cValidating').style.display = 'none';
-        byId('certStep1').style.display = 'none';
-        
-        byId('cIdentText').innerHTML = `<b style="color:var(--navy)">${escapeHTML(person.name)}'s</b> identity (via ${escapeHTML(person.verifiedBy)}) is instantly reused.`;
-        byId('certStep2').style.display = 'block';
-        
-        // Log consent
-        const action = () => {
-          consentLog.unshift({
-            name: person.name, phone, usedBy: 'Certificate Portal', 
-            source: person.verifiedBy, date: Date.now(), 
-            scope: 'Identity verified'
-          });
-          persist();
-          renderConsent();
-        };
-        if (offline) {
-          addOfflineAction('Certificate Consent for ' + person.name, action);
-        } else {
-          action();
-        }
-      }, 1000);
-    } else {
-      byId('cFallback').style.display = 'block';
-      byId('cCheckVault').style.display = 'inline-flex';
-    }
-  };
-
-  byId('certForm').onsubmit = e => {
-    e.preventDefault();
-    byId('certStep2').style.display = 'none';
-    byId('certStep3').style.display = 'block';
-    
-    const appId = 'CERT-' + Math.floor(Math.random()*1000000);
-    byId('cAppId').textContent = appId;
-    byId('cDate').textContent = new Date().toLocaleDateString('en-IN');
-    
-    // Reset styling just in case
-    byId('slaBox').style.background = '#fefce8';
-    byId('slaBox').style.borderColor = '#fde047';
-    byId('slaTimer').style.color = '#ca8a04';
-    byId('fastForwardBtn').style.display = 'inline-flex';
-    byId('reviewSpinner').style.display = 'block';
-    byId('escalatedIcon').style.display = 'none';
-    byId('statusText').textContent = 'Under Review';
-    byId('statusText').style.color = 'var(--blue)';
-    byId('statusSub').innerHTML = 'Awaiting official approval';
-    
-    // Start fake SLA timer
-    let timeRemaining = 15 * 86400; // 15 days in seconds
-    clearInterval(certAppInterval);
-    
-    const updateTimer = () => {
-      if(timeRemaining <= 0) {
-        clearInterval(certAppInterval);
-        triggerEscalation(appId);
-        return;
-      }
-      const d = Math.floor(timeRemaining / 86400);
-      const h = Math.floor((timeRemaining % 86400) / 3600);
-      const m = Math.floor((timeRemaining % 3600) / 60);
-      const s = timeRemaining % 60;
-      byId('slaTimer').textContent = `${d} days ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-      timeRemaining--;
-    };
-    
-    certAppInterval = setInterval(updateTimer, 1000);
-    updateTimer();
-  };
-
-  byId('fastForwardBtn').onclick = () => {
-    clearInterval(certAppInterval);
-    triggerEscalation(byId('cAppId').textContent);
-  };
-  
-  let escalations = JSON.parse(localStorage.getItem('verifyOnceEscalations')||'null') || [];
-  
-  function triggerEscalation(appId) {
-    byId('slaBox').style.background = '#fef2f2';
-    byId('slaBox').style.borderColor = '#fca5a5';
-    byId('slaTimer').textContent = 'SLA Breached';
-    byId('slaTimer').style.color = '#ef4444';
-    byId('fastForwardBtn').style.display = 'none';
-    
-    byId('reviewSpinner').style.display = 'none';
-    byId('escalatedIcon').style.display = 'grid';
-    byId('statusText').textContent = 'Escalated to District Officer';
-    byId('statusText').style.color = '#ef4444';
-    byId('statusSub').innerHTML = '⚠️ SLA missed. Auto-escalated.';
-    
-    const type = byId('certType').value;
-    escalations.unshift({
-      appId, type, date: Date.now(), status: 'Escalated to DO'
-    });
-    localStorage.setItem('verifyOnceEscalations', JSON.stringify(escalations));
-    renderEscalations();
-  }
-  
-  function renderEscalations() {
-    const node = byId('escalationList');
-    if(!node) return;
-    node.innerHTML = escalations.length ? escalations.map(x => `
-      <div class="consent-row">
-        <div class="consent-icon" style="background:#fee2e2; color:#ef4444;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
-        <div style="flex:1">
-          <b style="color:#b91c1c;">${escapeHTML(x.appId)} - ${escapeHTML(x.type)}</b>
-          <p style="color:#991b1b;">Status: ${escapeHTML(x.status)} · 15-day SLA Breached</p>
-        </div>
-        <span class="date" style="background:#fef2f2; color:#b91c1c;">${formatTime(x.date)}</span>
-      </div>
-    `).join('') : `
-      <div class="empty">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <p style="font-size:16px;font-weight:500;color:var(--navy)">No escalations yet.</p>
-        <p>Applications that breach their SLA will appear here.</p>
-      </div>
-    `;
-  }
-  renderEscalations();
-
-  // Offline Queue Logic
-  let offlineQueue = [];
-  function addOfflineAction(description, actionFn) {
-    offlineQueue.push({ description, actionFn });
-    renderOfflineQueue();
-    showToast('Action saved for offline sync', false);
-  }
-  function renderOfflineQueue() {
-    const list = byId('offlineQueueList');
-    const container = byId('offlineQueueContainer');
-    list.innerHTML = offlineQueue.map(q => `<li>${escapeHTML(q.description)} <span class="sync-status" style="margin-left:8px;font-weight:600;">(Pending)</span></li>`).join('');
-    container.style.display = offlineQueue.length > 0 ? 'block' : 'none';
-  }
-
-  let offline = false;
-  byId('offlineToggle').onclick = () => {
-    offline = !offline;
-    byId('offlineToggle').innerHTML = offline ? 
-      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path><path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg> Offline' : 
-      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg> Online';
-    byId('offlineToggle').style.color = offline ? '#92400e' : '';
-    byId('offlineToggle').style.background = offline ? '#fde68a' : '';
-    byId('offlineNote').style.display = offline ? 'flex' : 'none';
-
-    if (!offline && offlineQueue.length > 0) {
-      const listItems = byId('offlineQueueList').querySelectorAll('li');
-      listItems.forEach(li => {
-        const stat = li.querySelector('.sync-status');
-        stat.textContent = '(Processing...)';
-        stat.style.color = 'var(--blue)';
-      });
-      setTimeout(() => {
-        offlineQueue.forEach(q => q.actionFn());
-        listItems.forEach(li => {
-          const stat = li.querySelector('.sync-status');
-          stat.textContent = '(Synced ✓)';
-          stat.style.color = 'var(--green)';
-        });
-        showToast('All offline actions synced!');
-        setTimeout(() => {
-          offlineQueue = [];
-          renderOfflineQueue();
-        }, 2000);
-      }, 1500);
-    }
-  };
-  
-  let currentCscPhone = '';
-  byId('cscLookup').onclick = () => {
-    const phone = byId('cscPhone').value.trim();
-    const p = vault.find(x => x.phone === phone);
-    const n = byId('cscResult');
-    if(p && p.revoked) {
-       n.style.display = 'block';
-       n.innerHTML = '<span style="color:#ef4444;font-weight:600;">Verification revoked — please re-verify.</span>';
-       return;
-    }
-    if (p) {
-      currentCscPhone = phone;
-      byId('cscCitizenModal').classList.add('show');
-    } else {
-      n.style.display = 'block';
-      n.innerHTML = 'No verified identity found. Help the citizen complete the Ration Card verification.';
-    }
-  };
-
-  byId('cscDenyConsent').onclick = () => {
-    byId('cscCitizenModal').classList.remove('show');
-    const n = byId('cscResult');
-    n.style.display = 'block';
-    n.innerHTML = '<span style="color:#ef4444;font-weight:600;">Citizen denied the request.</span>';
-  };
-
-  byId('cscAllowConsent').onclick = () => {
-    byId('cscCitizenModal').classList.remove('show');
-    const p = vault.find(x => x.phone === currentCscPhone);
-    const action = () => {
-      consentLog.unshift({
-        name: p.name, phone: currentCscPhone, usedBy: 'CSC Operator', 
-        source: p.verifiedBy, date: Date.now(), 
-        scope: 'Verified identity'
-      });
-      persist();
-      renderConsent();
-      const n = byId('cscResult');
-      n.style.display = 'block';
-      n.innerHTML = `<span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;"><svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${escapeHTML(p.name)} is verified</span>Valid until ${escapeHTML(p.validUntil)}.`;
-    };
-    if (offline) {
-      addOfflineAction('CSC Consent for ' + p.name, action);
-      const n = byId('cscResult');
-      n.style.display = 'block';
-      n.innerHTML = `<span style="color:#ca8a04;font-weight:600;">Consent saved locally. Will sync when online.</span>`;
-    } else {
-      action();
-    }
-  };
-  
-  const dict = {
-    "Ration Card Portal": "राशन कार्ड पोर्टल",
-    "Scholarship Portal": "छात्रवृत्ति पोर्टल",
-    "🌾 PDS Portal (Rural)": "🌾 पीडीएस पोर्टल (ग्रामीण)",
-    "Certificate Portal": "प्रमाणपत्र पोर्टल",
-    "My consent log": "मेरा सहमति लॉग",
-    "Escalation log": "वृद्धि लॉग",
-    "CSC assisted mode": "सीएससी सहायता मोड",
-    "Verify your identity": "अपनी पहचान सत्यापित करें",
-    "Start scholarship application": "छात्रवृत्ति आवेदन शुरू करें",
-    "Get your Ration": "अपना राशन प्राप्त करें",
-    "Apply for Certificate": "प्रमाणपत्र के लिए आवेदन करें",
-    "Escalation Log": "वृद्धि लॉग",
-    "Your consent, clearly recorded": "आपकी सहमति, स्पष्ट रूप से दर्ज",
-    "Active verifications": "सक्रिय सत्यापन",
-    "Consent activity": "सहमति गतिविधि",
-    "Help a citizen reuse verification": "नागरिक को सत्यापन का पुन: उपयोग करने में मदद करें",
-    "Send OTP": "OTP भेजें",
-    "Verify documents": "दस्तावेज़ सत्यापित करें",
-    "Fetch details from DigiLocker": "DigiLocker से विवरण प्राप्त करें",
-    "Check verification": "सत्यापन जांचें",
-    "Review and use verified identity": "सत्यापित पहचान की समीक्षा करें और उपयोग करें",
-    "Check Verified Identity": "सत्यापित पहचान जांचें",
-    "Use Identity Now": "अब पहचान का उपयोग करें",
-    "Verify Identity": "पहचान सत्यापित करें",
-    "Submit Application": "आवेदन जमा करें",
-    "Find verified identity": "सत्यापित पहचान खोजें",
-    "Phone number": "फ़ोन नंबर",
-    "Citizen Phone Number": "नागरिक फ़ोन नंबर",
-    "Citizen phone number": "नागरिक फ़ोन नंबर",
-    "Full name": "पूरा नाम",
-    "Enter OTP": "OTP दर्ज करें",
-    "SLA Breaches": "SLA उल्लंघन"
-  };
-  let isHindi = false;
-  function walkAndTranslate(node) {
-    if (node.nodeType === 3) {
-      let t = node.nodeValue.trim();
-      if (!t) return;
-      if (!node.originalText) { node.originalText = t; }
-      const key = node.originalText;
-      if (dict[key]) {
-        node.nodeValue = isHindi ? node.nodeValue.replace(key, dict[key]) : node.nodeValue.replace(dict[key], key);
-      }
-    } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
-      node.childNodes.forEach(walkAndTranslate);
-    }
-  }
-
-  byId('langToggle').onclick = () => {
-    isHindi = !isHindi;
-    byId('langToggle').textContent = isHindi ? 'English' : 'हिंदी';
-    document.querySelector('.hero h1').textContent = isHindi ? 'एक बार सत्यापित करें। तेजी से आवेदन करें। जवाबदेह रहें।' : 'Verify once. Apply faster. Stay accountable.';
-    document.querySelector('.hero p:nth-of-type(2)').innerHTML = isHindi ? 'डिजिलॉकर आपके दस्तावेज़ सुरक्षित रखता है। VerifyOnce आपका भरोसा सुरक्षित रखता है।<br><span style="font-size:16px; color:#dbeafe;">कोई बार-बार अपलोड नहीं, कोई बार-बार जांच नहीं। सरकारी पोर्टल आपकी सहमति से पहले से सत्यापित दस्तावेज़ों का उपयोग कर सकते हैं।</span>' : 'DigiLocker stores your documents. VerifyOnce stores your trust.<br><span style="font-size:16px; color:#dbeafe;">No re-uploads, no re-checks, ever. Government portals can instantly use already verified documents with simple consent.</span>';
-    
-    document.querySelectorAll('.tab, .card, .consent-hero, label, button').forEach(walkAndTranslate);
-  };
-
-  // Init
-  persist();
-  renderConsent();
- </script>
+ <script src="app.js"></script>
 </body>
 </html>
