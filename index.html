@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+  DEMO PROTOTYPE — All cryptographic signatures, OTP verification, and DigiLocker responses
+  are simulated client-side for demonstration purposes only. Production deployment requires
+  server-side signing (HSM/KMS), backend OTP with rate-limiting, and encrypted server-side storage.
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -928,6 +933,15 @@
 
  <script>
   // Setup & Utils
+  
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag] || tag));
+  }
+
+  // DEMO ONLY: Simulated JWT generation. Do not use in production. No real secrets here.
   function generateMockJWT(payload) {
     const header = btoa(JSON.stringify({alg:"HS256",typ:"JWT"}));
     const data = btoa(JSON.stringify(payload));
@@ -993,7 +1007,11 @@
     if(step===4) { pBar.style.width = '100%'; label.textContent = 'Step 3 of 3: Complete verification'; }
   };
 
+  let isSendingOtp = false;
   byId('sendOtp').onclick = () => {
+    if (isSendingOtp) return;
+    isSendingOtp = true;
+    setTimeout(() => { isSendingOtp = false; }, 2000);
     const phone = byId('rPhone').value.trim();
     if(!/^\d{10}$/.test(phone)) {
       byId('rPhone').classList.add('error');
@@ -1157,7 +1175,7 @@
         setTimeout(() => {
           validating.remove();
           byId('pdsCheckVault').style.display = 'inline-flex';
-          byId('pdsReuseText').innerHTML = `<b>${person.name}'s</b> identity was verified by <b>${person.verifiedBy}</b>.`;
+          byId('pdsReuseText').innerHTML = `<b>${escapeHTML(person.name)}'s</b> identity was verified by <b>${escapeHTML(person.verifiedBy)}</b>.`;
           const banner = byId('pdsReuseBanner');
           banner.style.display = 'block';
           banner.classList.remove('celebrate');
@@ -1221,7 +1239,7 @@
         byId('sValidating').style.display = 'none';
         byId('checkVault').style.display = 'inline-flex';
         
-        byId('reuseText').innerHTML = `<b style="color:var(--navy)">${person.name}'s</b> identity was verified via <b>${person.verifiedBy}</b> on ${new Date(person.verifiedAt).toLocaleDateString('en-IN')}. Valid until ${person.validUntil}.`;
+        byId('reuseText').innerHTML = `<b style="color:var(--navy)">${escapeHTML(person.name)}'s</b> identity was verified via <b>${escapeHTML(person.verifiedBy)}</b> on ${new Date(person.verifiedAt).toLocaleDateString('en-IN')}. Valid until ${escapeHTML(person.validUntil)}.`;
         
         const banner = byId('reuseBanner');
         banner.style.display = 'block';
@@ -1285,12 +1303,12 @@
         <div class="consent-row">
           <div class="consent-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
           <div style="flex:1">
-            <b>${x.verifiedBy}</b>
-            <p>Verified on ${new Date(x.verifiedAt).toLocaleDateString('en-IN')} · Valid until ${x.validUntil}</p>
-            ${x.proofToken ? `<div style="font-family:monospace;font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all;">Token: ${x.proofToken.substring(0,40)}...</div>` : ''}
+            <b>${escapeHTML(x.verifiedBy)}</b>
+            <p>Verified on ${new Date(x.verifiedAt).toLocaleDateString('en-IN')} · Valid until ${escapeHTML(x.validUntil)}</p>
+            ${x.proofToken ? `<div style="font-family:monospace;font-size:11px;color:var(--muted);margin-top:4px;word-break:break-all;">Token: ${escapeHTML(x.proofToken.substring(0,40))}...</div>` : ''}
           </div>
           <div>
-            <button class="revoke-btn" onclick="revokeVerification('${x.phone}')">Revoke my verification</button>
+            <button class="revoke-btn" onclick="revokeVerification('${escapeHTML(x.phone)}')">Revoke my verification</button>
           </div>
         </div>
       `).join('') : `
@@ -1305,8 +1323,8 @@
       <div class="consent-row">
         <div class="consent-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
         <div>
-          <b>Your identity was shared with ${x.usedBy}</b>
-          <p>Using verification from ${x.source} · ${x.scope || 'Verified identity'} · ${x.name} (${x.phone})</p>
+          <b>Your identity was shared with ${escapeHTML(x.usedBy)}</b>
+          <p>Using verification from ${escapeHTML(x.source)} · ${escapeHTML(x.scope) || 'Verified identity'} · ${escapeHTML(x.name)} (${escapeHTML(x.phone)})</p>
         </div>
         <span class="date">${formatTime(x.date)}</span>
       </div>
@@ -1338,7 +1356,7 @@
         byId('cValidating').style.display = 'none';
         byId('certStep1').style.display = 'none';
         
-        byId('cIdentText').innerHTML = `<b style="color:var(--navy)">${person.name}'s</b> identity (via ${person.verifiedBy}) is instantly reused.`;
+        byId('cIdentText').innerHTML = `<b style="color:var(--navy)">${escapeHTML(person.name)}'s</b> identity (via ${escapeHTML(person.verifiedBy)}) is instantly reused.`;
         byId('certStep2').style.display = 'block';
         
         // Log consent
@@ -1440,8 +1458,8 @@
       <div class="consent-row">
         <div class="consent-icon" style="background:#fee2e2; color:#ef4444;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
         <div style="flex:1">
-          <b style="color:#b91c1c;">${x.appId} - ${x.type}</b>
-          <p style="color:#991b1b;">Status: ${x.status} · 15-day SLA Breached</p>
+          <b style="color:#b91c1c;">${escapeHTML(x.appId)} - ${escapeHTML(x.type)}</b>
+          <p style="color:#991b1b;">Status: ${escapeHTML(x.status)} · 15-day SLA Breached</p>
         </div>
         <span class="date" style="background:#fef2f2; color:#b91c1c;">${formatTime(x.date)}</span>
       </div>
@@ -1465,7 +1483,7 @@
   function renderOfflineQueue() {
     const list = byId('offlineQueueList');
     const container = byId('offlineQueueContainer');
-    list.innerHTML = offlineQueue.map(q => `<li>${q.description} <span class="sync-status" style="margin-left:8px;font-weight:600;">(Pending)</span></li>`).join('');
+    list.innerHTML = offlineQueue.map(q => `<li>${escapeHTML(q.description)} <span class="sync-status" style="margin-left:8px;font-weight:600;">(Pending)</span></li>`).join('');
     container.style.display = offlineQueue.length > 0 ? 'block' : 'none';
   }
 
@@ -1541,7 +1559,7 @@
       renderConsent();
       const n = byId('cscResult');
       n.style.display = 'block';
-      n.innerHTML = `<span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;"><svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${p.name} is verified</span>Valid until ${p.validUntil}.`;
+      n.innerHTML = `<span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin-bottom:6px;"><svg style="color:var(--green)" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> ${escapeHTML(p.name)} is verified</span>Valid until ${escapeHTML(p.validUntil)}.`;
     };
     if (offline) {
       addOfflineAction('CSC Consent for ' + p.name, action);
