@@ -289,7 +289,7 @@ button { display: inline-flex; justify-content: center; align-items: center; gap
 /* Certificate Portal Classes */
 .cert-sample { margin-bottom: 24px; }
 .cert-fallback { margin-top: 24px; }
-.cert-step-container { animation: slideUp 0.3s ease; }
+.cert-step-container { display: none; animation: slideUp 0.3s ease; }
 .cert-done { margin: 0 0 24px 0; border-color: var(--blue); background: #eff6ff; }
 .cert-done-header { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; margin-bottom: 6px; color: var(--blue); }
 .cert-ident-text { color: var(--navy); font-size: 14px; }
