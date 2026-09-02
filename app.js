@@ -210,20 +210,33 @@ const seedExpiry = new Date(Date.now() + 90 * 86400000);
 const seed = {
   name: 'Meera Patel',
   phone: '9876543210',
+  aadhaarNum: 'XXXX XXXX 8912',
   verifiedAt: Date.now() - 86400000 * 2,
   validUntil: seedExpiry.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
   verifiedBy: 'Ration Card Portal',
   documents: ['Aadhaar', 'Address proof']
 };
 
-let vault = JSON.parse(localStorage.getItem('verifyOnceVault') || 'null') || [seed];
+const seedDuplicate = {
+  name: 'Rohan Verma (Duplicate Test)',
+  phone: '9123456780',
+  aadhaarNum: 'XXXX XXXX 8912', // Reusing the same Aadhaar number as Meera Patel with a different phone
+  verifiedAt: Date.now() - 86400000 * 5,
+  validUntil: seedExpiry.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+  verifiedBy: 'Ration Card Portal',
+  documents: ['Aadhaar', 'Address proof']
+};
+
+let vault = JSON.parse(localStorage.getItem('verifyOnceVault') || 'null') || [seed, seedDuplicate];
 let consentLog = JSON.parse(localStorage.getItem('verifyOnceConsent') || 'null') || [];
+let certApplications = JSON.parse(localStorage.getItem('verifyOnceCertApplications') || 'null') || [];
 
 const byId = id => document.getElementById(id);
 
 const persist = () => {
   localStorage.setItem('verifyOnceVault', JSON.stringify(vault));
   localStorage.setItem('verifyOnceConsent', JSON.stringify(consentLog));
+  localStorage.setItem('verifyOnceCertApplications', JSON.stringify(certApplications));
   const countEl = byId('vaultCount');
   if (countEl) countEl.textContent = vault.length;
 };
@@ -255,6 +268,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     const viewEl = byId(tab.dataset.view);
     if (viewEl) viewEl.classList.add('active');
     if (tab.dataset.view === 'consent') renderConsent();
+    if (tab.dataset.view === 'officer') renderOfficerDashboard();
   };
 });
 
@@ -404,6 +418,44 @@ const rationForm = byId('rationForm');
 if (rationForm) {
   rationForm.onsubmit = e => {
     e.preventDefault();
+    const phone_val = byId('rPhone')?.value.trim() || '';
+    const isDigilocker = !byId('extraFields')?.classList.contains('hidden');
+    const aadhaar_val = byId('aadhaarNum')?.value.trim() || (isDigilocker ? 'XXXX XXXX 8912' : '');
+
+    const dupAlert = byId('duplicateAlert');
+    if (dupAlert) {
+      dupAlert.classList.add('hidden');
+      dupAlert.innerHTML = '';
+    }
+
+    // FEATURE 2: Duplicate Identity Detection
+    // Check if this Aadhaar number already exists in the vault under a DIFFERENT phone number
+    const normalizeAadhaar = (num) => String(num || '').replace(/\s+/g, '').toUpperCase();
+    if (aadhaar_val) {
+      const duplicateCitizen = vault.find(v => 
+        v.phone !== phone_val && 
+        v.aadhaarNum && 
+        normalizeAadhaar(v.aadhaarNum) === normalizeAadhaar(aadhaar_val)
+      );
+
+      if (duplicateCitizen) {
+        if (dupAlert) {
+          dupAlert.innerHTML = `
+            <div class="duplicate-warning-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <span>⚠️ Possible duplicate identity detected — this Aadhaar number is already linked to another account. Verification blocked for review.</span>
+            </div>
+            <div class="duplicate-warning-sub">
+              This Aadhaar is already registered to <b>${escapeHTML(duplicateCitizen.name)} (${escapeHTML(duplicateCitizen.phone)})</b>. Multiple citizen registrations with identical national IDs are prevented.
+            </div>
+          `;
+          dupAlert.classList.remove('hidden');
+        }
+        showToast('⚠️ Duplicate identity detected — verification blocked!', false);
+        return; // Halt and block verification
+      }
+    }
+
     byId('rationForm')?.classList.add('hidden');
     byId('rProgress')?.classList.add('hidden');
 
@@ -413,14 +465,13 @@ if (rationForm) {
     if (loadMsg) loadMsg.textContent = ' Checking documents & cryptographically signing credential…';
 
     setTimeout(async () => {
-      const phone_val = byId('rPhone')?.value.trim() || '';
-      const isDigilocker = !byId('extraFields')?.classList.contains('hidden');
       const docs_val = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
 
       const expiry = new Date(Date.now() + 90 * 86400000);
       const newPerson = {
         name: byId('rName')?.value.trim() || '',
         phone: phone_val,
+        aadhaarNum: aadhaar_val || 'XXXX XXXX 8912',
         verifiedAt: Date.now(),
         validUntil: expiry.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
         verifiedBy: 'Ration Card Portal',
@@ -785,6 +836,24 @@ if (certForm) {
     if (byId('cAppId')) byId('cAppId').textContent = appId;
     if (byId('cDate')) byId('cDate').textContent = new Date().toLocaleDateString('en-IN');
 
+    // Register application for Officer Dashboard
+    const cPhoneVal = byId('cPhone')?.value.trim() || '9876543210';
+    const applicant = vault.find(v => v.phone === cPhoneVal) || { name: 'Meera Patel', phone: cPhoneVal };
+    const certType = byId('certType')?.value || 'Income Certificate';
+
+    certApplications.unshift({
+      appId,
+      name: applicant.name,
+      phone: applicant.phone,
+      type: certType,
+      date: Date.now(),
+      status: 'Under Review',
+      daysRemaining: '15 days',
+      escalated: false
+    });
+    localStorage.setItem('verifyOnceCertApplications', JSON.stringify(certApplications));
+    renderOfficerDashboard();
+
     const slaBox = byId('slaBox');
     if (slaBox) slaBox.className = 'sla-box';
     const slaTimer = byId('slaTimer');
@@ -866,7 +935,29 @@ function triggerEscalation(appId) {
     status: 'Escalated to DO'
   });
   localStorage.setItem('verifyOnceEscalations', JSON.stringify(escalations));
+
+  // Update in certApplications for Officer Dashboard
+  const targetApp = certApplications.find(a => a.appId === appId);
+  if (targetApp) {
+    targetApp.status = 'Escalated to District Officer';
+    targetApp.daysRemaining = 'SLA Breached';
+    targetApp.escalated = true;
+  } else {
+    certApplications.unshift({
+      appId,
+      name: 'Meera Patel',
+      phone: '9876543210',
+      type,
+      date: Date.now(),
+      status: 'Escalated to District Officer',
+      daysRemaining: 'SLA Breached',
+      escalated: true
+    });
+  }
+  localStorage.setItem('verifyOnceCertApplications', JSON.stringify(certApplications));
+
   renderEscalations();
+  renderOfficerDashboard();
 }
 
 function renderEscalations() {
@@ -1215,6 +1306,127 @@ if (restoreProofBtn) {
   };
 }
 
+// Officer Dashboard Logic
+let loggedInOfficerId = sessionStorage.getItem('verifyOnceOfficerId') || '';
+
+const officerLoginForm = byId('officerLoginForm');
+if (officerLoginForm) {
+  officerLoginForm.onsubmit = e => {
+    e.preventDefault();
+    const idInput = byId('officerIdInput');
+    const officerId = idInput ? idInput.value.trim() : '';
+    if (!officerId) return;
+    loggedInOfficerId = officerId;
+    sessionStorage.setItem('verifyOnceOfficerId', officerId);
+    showToast('Logged in as Officer ' + officerId);
+    renderOfficerDashboard();
+  };
+}
+
+const officerLogoutBtn = byId('officerLogoutBtn');
+if (officerLogoutBtn) {
+  officerLogoutBtn.onclick = () => {
+    loggedInOfficerId = '';
+    sessionStorage.removeItem('verifyOnceOfficerId');
+    const idInput = byId('officerIdInput');
+    if (idInput) idInput.value = '';
+    showToast('Signed out of Officer Dashboard');
+    renderOfficerDashboard();
+  };
+}
+
+function renderOfficerDashboard() {
+  const loginView = byId('officerLoginView');
+  const dashView = byId('officerDashView');
+  if (!loginView || !dashView) return;
+
+  if (!loggedInOfficerId) {
+    loginView.classList.remove('hidden');
+    dashView.classList.add('hidden');
+    return;
+  }
+
+  loginView.classList.add('hidden');
+  dashView.classList.remove('hidden');
+
+  const badgeText = byId('officerBadgeText');
+  if (badgeText) badgeText.textContent = 'Officer: ' + loggedInOfficerId;
+
+  // If escalations exist from earlier sessions, ensure they appear in certApplications
+  if (escalations.length > 0 && certApplications.length === 0) {
+    escalations.forEach(esc => {
+      certApplications.push({
+        appId: esc.appId,
+        name: 'Meera Patel',
+        phone: '9876543210',
+        type: esc.type || 'Income Certificate',
+        date: esc.date || Date.now(),
+        status: 'Escalated to District Officer',
+        daysRemaining: 'SLA Breached',
+        escalated: true
+      });
+    });
+    localStorage.setItem('verifyOnceCertApplications', JSON.stringify(certApplications));
+  }
+
+  // Summary statistics
+  const total = certApplications.length;
+  const escalated = certApplications.filter(a => a.escalated || a.status === 'Escalated to District Officer').length;
+  const pending = total - escalated;
+
+  if (byId('officerStatTotal')) byId('officerStatTotal').textContent = total;
+  if (byId('officerStatPending')) byId('officerStatPending').textContent = pending;
+  if (byId('officerStatEscalated')) byId('officerStatEscalated').textContent = escalated;
+
+  const tbody = byId('officerTableBody');
+  const emptyState = byId('officerEmptyState');
+  const tableContainer = byId('officerTableContainer');
+
+  if (total === 0) {
+    if (tableContainer) tableContainer.classList.add('hidden');
+    if (emptyState) emptyState.classList.remove('hidden');
+    if (tbody) tbody.innerHTML = '';
+    return;
+  }
+
+  if (emptyState) emptyState.classList.add('hidden');
+  if (tableContainer) tableContainer.classList.remove('hidden');
+
+  // Sort: Breached applications (status = "Escalated to District Officer") must be sorted to the top
+  const sorted = [...certApplications].sort((a, b) => {
+    const aBreached = (a.escalated || a.status === 'Escalated to District Officer') ? 1 : 0;
+    const bBreached = (b.escalated || b.status === 'Escalated to District Officer') ? 1 : 0;
+    return bBreached - aBreached;
+  });
+
+  if (tbody) {
+    tbody.innerHTML = sorted.map(app => {
+      const isBreached = app.escalated || app.status === 'Escalated to District Officer';
+      const rowClass = isBreached ? 'officer-row officer-row-breached' : 'officer-row';
+      const statusBadge = isBreached ?
+        '<span class="officer-badge officer-badge-breached">Escalated to District Officer</span>' :
+        '<span class="officer-badge officer-badge-pending">Under Review</span>';
+      const slaPill = isBreached ?
+        '<span class="officer-sla-pill sla-alert">⚠️ SLA Breached (0 days)</span>' :
+        `<span class="officer-sla-pill sla-ok">${escapeHTML(app.daysRemaining || '15 days')}</span>`;
+      const filedDate = app.date ? new Date(app.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Today';
+
+      return `
+        <tr class="${rowClass}">
+          <td class="officer-td">
+            <b>${escapeHTML(app.name)}</b>
+            <div style="font-size:12px;color:var(--muted);">${escapeHTML(app.phone || '')} · ${escapeHTML(app.appId || '')}</div>
+          </td>
+          <td class="officer-td">${escapeHTML(app.type || 'Certificate')}</td>
+          <td class="officer-td">${escapeHTML(filedDate)}</td>
+          <td class="officer-td">${statusBadge}</td>
+          <td class="officer-td">${slaPill}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
 // Initial Web Crypto App Bootstrap
 async function initApp() {
   try {
@@ -1234,13 +1446,35 @@ async function initApp() {
     if (existingSeed) {
       existingSeed.proofToken = signedSeed.token;
       existingSeed.proofSignature = signedSeed.signatureHex;
+      existingSeed.aadhaarNum = seed.aadhaarNum;
     } else {
       vault.unshift(seed);
+    }
+
+    // Cryptographically sign the pre-seeded duplicate citizen for demonstration
+    const dupPayload = {
+      citizen_id: seedDuplicate.phone,
+      verified_by: seedDuplicate.verifiedBy,
+      verified_at: seedDuplicate.verifiedAt,
+      expires_at: seedExpiry.getTime()
+    };
+    const signedDup = await signCredential(dupPayload);
+    seedDuplicate.proofToken = signedDup.token;
+    seedDuplicate.proofSignature = signedDup.signatureHex;
+
+    const existingDup = vault.find(v => v.phone === seedDuplicate.phone);
+    if (existingDup) {
+      existingDup.proofToken = signedDup.token;
+      existingDup.proofSignature = signedDup.signatureHex;
+      existingDup.aadhaarNum = seedDuplicate.aadhaarNum;
+    } else {
+      vault.push(seedDuplicate);
     }
 
     persist();
     renderConsent();
     renderEscalations();
+    renderOfficerDashboard();
     updateTechPanel(signedSeed.token, signedSeed.signatureHex, seedPayload, false);
   } catch (err) {
     console.error('Web Crypto initialization error:', err);
