@@ -9,11 +9,201 @@ function escapeHTML(str) {
   }[tag] || tag));
 }
 
-function generateMockJWT(payload) {
-  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const data = btoa(JSON.stringify(payload));
-  const sig = btoa("mock-signature-" + Date.now()).substring(0, 43);
-  return `${header}.${data}.${sig}`;
+// Real Cryptographic Signing & Verification Layer using Web Crypto API (crypto.subtle)
+let issuerKeyPair = null;
+let exportedPublicKeyBase64 = '';
+let exportedPublicKeyHex = '';
+
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function arrayBufferToHex(buffer) {
+  const bytes = new Uint8Array(buffer);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function base64UrlEncode(str) {
+  return btoa(unescape(encodeURIComponent(str)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+function base64UrlDecode(str) {
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) {
+    base64 += '=';
+  }
+  return decodeURIComponent(escape(atob(base64)));
+}
+
+function bufferToBase64Url(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+function base64UrlToBuffer(base64url) {
+  let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) {
+    base64 += '=';
+  }
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+async function initWebCrypto() {
+  if (issuerKeyPair) return;
+  issuerKeyPair = await window.crypto.subtle.generateKey(
+    {
+      name: "ECDSA",
+      namedCurve: "P-256"
+    },
+    true,
+    ["sign", "verify"]
+  );
+
+  const spkiBuffer = await window.crypto.subtle.exportKey("spki", issuerKeyPair.publicKey);
+  exportedPublicKeyBase64 = arrayBufferToBase64(spkiBuffer);
+  exportedPublicKeyHex = arrayBufferToHex(spkiBuffer);
+
+  const keyDisplay = byId('publicKeyDisplay');
+  if (keyDisplay) keyDisplay.textContent = exportedPublicKeyBase64;
+}
+
+async function signCredential(payload) {
+  if (!issuerKeyPair) {
+    await initWebCrypto();
+  }
+  const header = { alg: "ES256", typ: "JWT" };
+  const encodedHeader = base64UrlEncode(JSON.stringify(header));
+  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+  const signingInput = `${encodedHeader}.${encodedPayload}`;
+
+  const signatureBuffer = await window.crypto.subtle.sign(
+    {
+      name: "ECDSA",
+      hash: { name: "SHA-256" }
+    },
+    issuerKeyPair.privateKey,
+    new TextEncoder().encode(signingInput)
+  );
+
+  const encodedSignature = bufferToBase64Url(signatureBuffer);
+  const token = `${signingInput}.${encodedSignature}`;
+  const signatureHex = arrayBufferToHex(signatureBuffer);
+  const signatureBase64 = arrayBufferToBase64(signatureBuffer);
+
+  return {
+    token,
+    signatureHex,
+    signatureBase64,
+    payload
+  };
+}
+
+async function verifyCredential(token, expectedPhone = null) {
+  try {
+    if (!token || typeof token !== 'string') {
+      return { valid: false, reason: "No proof token presented" };
+    }
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return { valid: false, reason: "Malformed token structure (expected 3-part compact JWT)" };
+    }
+    const [headerB64, payloadB64, sigB64] = parts;
+    const signingInput = `${headerB64}.${payloadB64}`;
+    const signatureBuffer = base64UrlToBuffer(sigB64);
+
+    let payload;
+    try {
+      payload = JSON.parse(base64UrlDecode(payloadB64));
+    } catch (e) {
+      return { valid: false, reason: "Invalid JSON in credential payload" };
+    }
+
+    if (!issuerKeyPair) {
+      await initWebCrypto();
+    }
+
+    const isCryptoValid = await window.crypto.subtle.verify(
+      {
+        name: "ECDSA",
+        hash: { name: "SHA-256" }
+      },
+      issuerKeyPair.publicKey,
+      signatureBuffer,
+      new TextEncoder().encode(signingInput)
+    );
+
+    if (!isCryptoValid) {
+      return {
+        valid: false,
+        reason: "Cryptographic signature mismatch! The payload data was modified after signing (ECDSA verification failed).",
+        payload
+      };
+    }
+
+    if (expectedPhone && payload.citizen_id && payload.citizen_id !== expectedPhone) {
+      return {
+        valid: false,
+        reason: `Identity mismatch: credential citizen_id (${payload.citizen_id}) does not match requested phone (${expectedPhone}).`,
+        payload
+      };
+    }
+
+    if (payload.expires_at && Date.now() > payload.expires_at) {
+      return {
+        valid: false,
+        reason: "Credential has expired.",
+        payload
+      };
+    }
+
+    return {
+      valid: true,
+      reason: "Cryptographically verified using ECDSA P-256 / SHA-256",
+      payload,
+      signatureHex: arrayBufferToHex(signatureBuffer)
+    };
+  } catch (err) {
+    return {
+      valid: false,
+      reason: `Verification error: ${err.message}`
+    };
+  }
+}
+
+function updateTechPanel(token, signatureHex, payload, isTampered = false) {
+  if (byId('publicKeyDisplay')) byId('publicKeyDisplay').textContent = exportedPublicKeyBase64 || 'Generating...';
+  if (byId('signatureDisplay')) byId('signatureDisplay').textContent = signatureHex || 'N/A';
+  if (byId('payloadDisplay')) byId('payloadDisplay').textContent = payload ? JSON.stringify(payload, null, 2) : 'N/A';
+  if (byId('jwtToken')) byId('jwtToken').textContent = token || '';
+  if (byId('tamperStatus')) {
+    if (isTampered) {
+      byId('tamperStatus').textContent = 'Status: Tampered (Signature Mismatch!)';
+      byId('tamperStatus').className = 'tech-badge tech-badge-danger';
+    } else {
+      byId('tamperStatus').textContent = 'Status: Signature Valid';
+      byId('tamperStatus').className = 'tech-badge tech-badge-success';
+    }
+  }
 }
 
 const seedExpiry = new Date(Date.now() + 90 * 86400000);
@@ -25,12 +215,6 @@ const seed = {
   verifiedBy: 'Ration Card Portal',
   documents: ['Aadhaar', 'Address proof']
 };
-seed.proofToken = generateMockJWT({
-  citizen_id: seed.phone,
-  verified_by: seed.verifiedBy,
-  verified_at: seed.verifiedAt,
-  expires_at: seedExpiry.getTime()
-});
 
 let vault = JSON.parse(localStorage.getItem('verifyOnceVault') || 'null') || [seed];
 let consentLog = JSON.parse(localStorage.getItem('verifyOnceConsent') || 'null') || [];
@@ -226,9 +410,9 @@ if (rationForm) {
     const ver = byId('verifying');
     if (ver) ver.style.display = 'block';
     const loadMsg = byId('loadMsg');
-    if (loadMsg) loadMsg.textContent = ' Checking documents securely…';
+    if (loadMsg) loadMsg.textContent = ' Checking documents & cryptographically signing credential…';
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const phone_val = byId('rPhone')?.value.trim() || '';
       const isDigilocker = !byId('extraFields')?.classList.contains('hidden');
       const docs_val = isDigilocker ? ['Aadhaar Card', 'PAN Record', 'Driving License', 'Address proof'] : ['Aadhaar', 'Address proof'];
@@ -243,13 +427,16 @@ if (rationForm) {
         documents: docs_val
       };
 
-      const token = generateMockJWT({
+      const payload = {
         citizen_id: phone_val,
         verified_by: newPerson.verifiedBy,
         verified_at: newPerson.verifiedAt,
         expires_at: expiry.getTime()
-      });
-      newPerson.proofToken = token;
+      };
+
+      const signed = await signCredential(payload);
+      newPerson.proofToken = signed.token;
+      newPerson.proofSignature = signed.signatureHex;
 
       const action = () => {
         vault = vault.filter(v => v.phone !== phone_val);
@@ -263,11 +450,11 @@ if (rationForm) {
         action();
       }
 
-      if (byId('jwtToken')) byId('jwtToken').textContent = token;
+      updateTechPanel(signed.token, signed.signatureHex, payload, false);
       if (ver) ver.style.display = 'none';
       const successBox = byId('rationSuccess');
       if (successBox) successBox.style.display = 'block';
-      showToast('Identity verified and saved to vault');
+      showToast('Identity verified and signed cryptographically (ECDSA P-256)');
     }, 2000);
   };
 }
@@ -286,7 +473,7 @@ if (checkVaultBtn) {
   checkVaultBtn.onclick = checkVault;
 }
 
-function checkVault() {
+async function checkVault() {
   const phone = byId('sPhone')?.value.trim() || '';
   const person = vault.find(v => v.phone === phone);
 
@@ -307,28 +494,44 @@ function checkVault() {
       return;
     }
 
-    if (byId('sValidating')) byId('sValidating').style.display = 'flex';
+    if (byId('sValidating')) {
+      byId('sValidating').innerHTML = '<div class="spinner"></div> Cryptographically validating ECDSA signature...';
+      byId('sValidating').style.display = 'flex';
+    }
     if (byId('checkVault')) byId('checkVault').style.display = 'none';
+
+    // Real cryptographic signature check via Web Crypto API
+    const verification = await verifyCredential(person.proofToken, person.phone);
 
     setTimeout(() => {
       if (byId('sValidating')) byId('sValidating').style.display = 'none';
       if (byId('checkVault')) byId('checkVault').style.display = 'inline-flex';
 
-      if (byId('reuseText')) {
-        byId('reuseText').innerHTML = `<b class="citizen-highlight">${escapeHTML(person.name)}'s</b> identity was verified via <b>${escapeHTML(person.verifiedBy)}</b> on ${new Date(person.verifiedAt).toLocaleDateString('en-IN')}. Valid until ${escapeHTML(person.validUntil)}.`;
-      }
+      if (verification.valid) {
+        if (byId('reuseText')) {
+          byId('reuseText').innerHTML = `<b class="citizen-highlight">${escapeHTML(person.name)}'s</b> identity was verified via <b>${escapeHTML(person.verifiedBy)}</b> on ${new Date(person.verifiedAt).toLocaleDateString('en-IN')}. Valid until ${escapeHTML(person.validUntil)}.<div class="tech-badge tech-badge-success mt-20">✓ ECDSA P-256 Signature Verified (Web Crypto API)</div>`;
+        }
 
-      const banner = byId('reuseBanner');
-      if (banner) {
-        banner.style.display = 'block';
-        banner.classList.remove('celebrate');
-        void banner.offsetWidth;
-        banner.classList.add('celebrate');
-      }
+        const banner = byId('reuseBanner');
+        if (banner) {
+          banner.style.display = 'block';
+          banner.classList.remove('celebrate');
+          void banner.offsetWidth;
+          banner.classList.add('celebrate');
+        }
 
-      const useBtn = byId('useIdentity');
-      if (useBtn) useBtn.dataset.phone = phone;
-    }, 1000);
+        const useBtn = byId('useIdentity');
+        if (useBtn) useBtn.dataset.phone = phone;
+      } else {
+        // Tamper detected or invalid signature
+        if (byId('fallbackTitle')) byId('fallbackTitle').textContent = '❌ Verification Failed: Signature Invalid';
+        if (byId('fallbackSub')) {
+          byId('fallbackSub').innerHTML = `<strong>Tampering Detected:</strong> Web Crypto signature verification failed.<br><span class="text-danger">${escapeHTML(verification.reason)}</span>`;
+        }
+        if (byId('fallback')) byId('fallback').style.display = 'block';
+        showToast('Cryptographic signature verification failed: Tampered proof!', false);
+      }
+    }, 600);
   } else {
     if (byId('fallbackTitle')) byId('fallbackTitle').textContent = 'Identity not found in shared vault';
     if (byId('fallbackSub')) byId('fallbackSub').textContent = 'Please upload your Aadhaar and address proof to continue.';
@@ -405,7 +608,7 @@ function checkPdsVault() {
   if (byId('pdsVerifying')) byId('pdsVerifying').style.display = 'block';
   if (byId('pdsCheckVault')) byId('pdsCheckVault').style.display = 'none';
 
-  setTimeout(() => {
+  setTimeout(async () => {
     if (byId('pdsVerifying')) byId('pdsVerifying').style.display = 'none';
 
     const person = vault.find(v => v.phone === phone);
@@ -422,32 +625,44 @@ function checkPdsVault() {
       validating.className = 'validating-step';
       validating.style.display = 'flex';
       validating.style.margin = '0 0 24px 0';
-      validating.innerHTML = '<div class="spinner"></div> Validating signature ✓';
+      validating.innerHTML = '<div class="spinner"></div> Cryptographically validating ECDSA signature...';
       byId('pdsCheckVault')?.parentElement.insertBefore(validating, byId('pdsReuseBanner'));
+
+      // Real signature verification
+      const verification = await verifyCredential(person.proofToken, person.phone);
 
       setTimeout(() => {
         validating.remove();
         if (byId('pdsCheckVault')) byId('pdsCheckVault').style.display = 'inline-flex';
-        if (byId('pdsReuseText')) {
-          byId('pdsReuseText').innerHTML = `<b>${escapeHTML(person.name)}'s</b> identity was verified by <b>${escapeHTML(person.verifiedBy)}</b>.`;
+
+        if (verification.valid) {
+          if (byId('pdsReuseText')) {
+            byId('pdsReuseText').innerHTML = `<b>${escapeHTML(person.name)}'s</b> identity was verified by <b>${escapeHTML(person.verifiedBy)}</b>.<br><span class="tech-badge tech-badge-success" style="margin-top:6px;">✓ ECDSA Signature Verified</span>`;
+          }
+          const banner = byId('pdsReuseBanner');
+          if (banner) {
+            banner.style.display = 'block';
+            banner.classList.remove('celebrate');
+            void banner.offsetWidth;
+            banner.classList.add('celebrate');
+          }
+          const useBtn = byId('pdsUseIdentity');
+          if (useBtn) useBtn.dataset.phone = phone;
+        } else {
+          // Signature invalid / tampered
+          if (byId('pdsFallbackTitle')) byId('pdsFallbackTitle').textContent = '❌ Signature Verification Failed';
+          if (byId('pdsFallbackSub')) byId('pdsFallbackSub').innerHTML = `Tamper detected: Web Crypto verification failed.<br><span class="text-danger">${escapeHTML(verification.reason)}</span>`;
+          if (byId('pdsFallback')) byId('pdsFallback').style.display = 'block';
+          showToast('PDS verification failed: Tampered proof!', false);
         }
-        const banner = byId('pdsReuseBanner');
-        if (banner) {
-          banner.style.display = 'block';
-          banner.classList.remove('celebrate');
-          void banner.offsetWidth;
-          banner.classList.add('celebrate');
-        }
-        const useBtn = byId('pdsUseIdentity');
-        if (useBtn) useBtn.dataset.phone = phone;
-      }, 1000);
+      }, 700);
     } else {
       if (byId('pdsCheckVault')) byId('pdsCheckVault').style.display = 'inline-flex';
       if (byId('pdsFallbackTitle')) byId('pdsFallbackTitle').textContent = 'No identity found.';
       if (byId('pdsFallbackSub')) byId('pdsFallbackSub').textContent = 'Cannot proceed without documents.';
       if (byId('pdsFallback')) byId('pdsFallback').style.display = 'block';
     }
-  }, 2500);
+  }, 1200);
 }
 
 const pdsUseIdentityBtn = byId('pdsUseIdentity');
@@ -493,7 +708,7 @@ if (certTrySampleBtn) {
 
 const cCheckVaultBtn = byId('cCheckVault');
 if (cCheckVaultBtn) {
-  cCheckVaultBtn.onclick = () => {
+  cCheckVaultBtn.onclick = async () => {
     const phone = byId('cPhone')?.value.trim() || '';
     const person = vault.find(v => v.phone === phone);
 
@@ -505,37 +720,53 @@ if (cCheckVaultBtn) {
     }
 
     if (person && !person.revoked) {
-      if (byId('cValidating')) byId('cValidating').style.display = 'flex';
+      if (byId('cValidating')) {
+        byId('cValidating').innerHTML = '<div class="spinner"></div> Cryptographically validating ECDSA signature...';
+        byId('cValidating').style.display = 'flex';
+      }
       if (byId('cCheckVault')) byId('cCheckVault').style.display = 'none';
+
+      // Real signature verification
+      const verification = await verifyCredential(person.proofToken, person.phone);
 
       setTimeout(() => {
         if (byId('cValidating')) byId('cValidating').style.display = 'none';
-        if (byId('certStep1')) byId('certStep1').style.display = 'none';
 
-        if (byId('cIdentText')) {
-          byId('cIdentText').innerHTML = `<b class="citizen-highlight">${escapeHTML(person.name)}'s</b> identity (via ${escapeHTML(person.verifiedBy)}) is instantly reused.`;
-        }
-        if (byId('certStep2')) byId('certStep2').style.display = 'block';
+        if (verification.valid) {
+          if (byId('certStep1')) byId('certStep1').style.display = 'none';
 
-        const action = () => {
-          consentLog.unshift({
-            name: person.name,
-            phone,
-            usedBy: 'Certificate Portal',
-            source: person.verifiedBy,
-            date: Date.now(),
-            scope: 'Identity verified'
-          });
-          persist();
-          renderConsent();
-        };
+          if (byId('cIdentText')) {
+            byId('cIdentText').innerHTML = `<b class="citizen-highlight">${escapeHTML(person.name)}'s</b> identity (via ${escapeHTML(person.verifiedBy)}) is instantly reused.<br><span class="tech-badge tech-badge-success" style="margin-top:6px;">✓ ECDSA Signature Verified</span>`;
+          }
+          if (byId('certStep2')) byId('certStep2').style.display = 'block';
 
-        if (offline) {
-          addOfflineAction('Certificate Consent for ' + person.name, action);
+          const action = () => {
+            consentLog.unshift({
+              name: person.name,
+              phone,
+              usedBy: 'Certificate Portal',
+              source: person.verifiedBy,
+              date: Date.now(),
+              scope: 'Identity verified'
+            });
+            persist();
+            renderConsent();
+          };
+
+          if (offline) {
+            addOfflineAction('Certificate Consent for ' + person.name, action);
+          } else {
+            action();
+          }
         } else {
-          action();
+          if (byId('cCheckVault')) byId('cCheckVault').style.display = 'inline-flex';
+          if (byId('cFallback')) {
+            byId('cFallback').innerHTML = `<h3 class="text-danger">❌ Signature Verification Failed</h3><p>Tampering detected! The stored proof signature does not match the claims data.</p><p class="text-danger" style="font-size:12px;">${escapeHTML(verification.reason)}</p>`;
+            byId('cFallback').style.display = 'block';
+          }
+          showToast('Certificate portal: Cryptographic verification failed!', false);
         }
-      }, 1000);
+      }, 700);
     } else {
       if (byId('cFallback')) byId('cFallback').style.display = 'block';
       if (byId('cCheckVault')) byId('cCheckVault').style.display = 'inline-flex';
@@ -789,7 +1020,7 @@ if (offlineToggleBtn) {
 let currentCscPhone = '';
 const cscLookupBtn = byId('cscLookup');
 if (cscLookupBtn) {
-  cscLookupBtn.onclick = () => {
+  cscLookupBtn.onclick = async () => {
     const phone = byId('cscPhone')?.value.trim() || '';
     const p = vault.find(x => x.phone === phone);
     const n = byId('cscResult');
@@ -800,6 +1031,13 @@ if (cscLookupBtn) {
       return;
     }
     if (p) {
+      const verification = await verifyCredential(p.proofToken, p.phone);
+      if (!verification.valid) {
+        n.style.display = 'block';
+        n.innerHTML = `<span class="csc-denied-notice">❌ Verification Failed: Signature mismatch! Altered proof detected.<br><small>${escapeHTML(verification.reason)}</small></span>`;
+        showToast('CSC Lookup: Cryptographic verification failed!', false);
+        return;
+      }
       currentCscPhone = phone;
       byId('cscCitizenModal')?.classList.add('show');
     } else {
@@ -927,7 +1165,86 @@ if (langToggleBtn) {
   };
 }
 
-// Initial Render
-persist();
-renderConsent();
-renderEscalations();
+// Tamper Demonstration Controls
+const tamperProofBtn = byId('tamperProofBtn');
+if (tamperProofBtn) {
+  tamperProofBtn.onclick = () => {
+    const p = vault.find(x => x.phone === seed.phone) || vault[0];
+    if (!p || !p.proofToken) {
+      showToast('No proof token available to tamper', false);
+      return;
+    }
+    const parts = p.proofToken.split('.');
+    if (parts.length === 3) {
+      try {
+        const payload = JSON.parse(base64UrlDecode(parts[1]));
+        // Tamper with citizen ID and issuing authority
+        payload.citizen_id = '9999999999';
+        payload.tampered = true;
+        payload.verified_by = 'Forged / Altered Portal';
+        const tamperedPayloadB64 = base64UrlEncode(JSON.stringify(payload));
+        // Keep original signature with modified data to prove cryptographic detection
+        p.proofToken = `${parts[0]}.${tamperedPayloadB64}.${parts[2]}`;
+        persist();
+        updateTechPanel(p.proofToken, p.proofSignature, payload, true);
+        showToast('Proof payload tampered! Test verification in Scholarship or PDS portal.', false);
+      } catch (e) {
+        showToast('Failed to tamper token: ' + e.message, false);
+      }
+    }
+  };
+}
+
+const restoreProofBtn = byId('restoreProofBtn');
+if (restoreProofBtn) {
+  restoreProofBtn.onclick = async () => {
+    const p = vault.find(x => x.phone === seed.phone) || vault[0];
+    if (!p) return;
+    const payload = {
+      citizen_id: p.phone,
+      verified_by: 'Ration Card Portal',
+      verified_at: p.verifiedAt || Date.now(),
+      expires_at: seedExpiry.getTime()
+    };
+    const signed = await signCredential(payload);
+    p.proofToken = signed.token;
+    p.proofSignature = signed.signatureHex;
+    persist();
+    updateTechPanel(signed.token, signed.signatureHex, payload, false);
+    showToast('Valid cryptographic signature re-generated & restored!');
+  };
+}
+
+// Initial Web Crypto App Bootstrap
+async function initApp() {
+  try {
+    await initWebCrypto();
+    // Cryptographically sign the pre-verified seed citizen with real private key
+    const seedPayload = {
+      citizen_id: seed.phone,
+      verified_by: seed.verifiedBy,
+      verified_at: seed.verifiedAt,
+      expires_at: seedExpiry.getTime()
+    };
+    const signedSeed = await signCredential(seedPayload);
+    seed.proofToken = signedSeed.token;
+    seed.proofSignature = signedSeed.signatureHex;
+
+    const existingSeed = vault.find(v => v.phone === seed.phone);
+    if (existingSeed) {
+      existingSeed.proofToken = signedSeed.token;
+      existingSeed.proofSignature = signedSeed.signatureHex;
+    } else {
+      vault.unshift(seed);
+    }
+
+    persist();
+    renderConsent();
+    renderEscalations();
+    updateTechPanel(signedSeed.token, signedSeed.signatureHex, seedPayload, false);
+  } catch (err) {
+    console.error('Web Crypto initialization error:', err);
+  }
+}
+
+initApp();

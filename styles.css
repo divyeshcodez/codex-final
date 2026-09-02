@@ -244,8 +244,25 @@ button { display: inline-flex; justify-content: center; align-items: center; gap
 .doc-title { font-size: 14px; color: var(--navy); display: block; line-height: 1.2; }
 .doc-sub { font-size: 12px; color: var(--muted); }
 
-.tech-note { margin-bottom: 8px; font-family: 'Inter', sans-serif; font-size: 13px; color: var(--navy); font-weight: 600; }
+.tech-note { margin-bottom: 12px; font-family: 'Inter', sans-serif; font-size: 13px; color: #1e3a8a; font-weight: 600; background: #eff6ff; padding: 10px 12px; border-radius: 8px; border-left: 4px solid var(--blue); line-height: 1.4; }
+.tech-item { margin-bottom: 12px; }
+.tech-label { font-weight: 700; color: var(--navy); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-family: 'Inter', sans-serif; display: flex; justify-content: space-between; align-items: center; }
+.tech-code { display: block; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 11px; color: #334155; word-break: break-all; max-height: 110px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
 .jwt-token { color: #2563eb; }
+.tech-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.tech-badge-success { background: #dcfce7; color: #166534; }
+.tech-badge-danger { background: #fee2e2; color: #991b1b; }
+.tech-tamper-box { margin-top: 14px; padding: 14px; border-radius: 10px; background: #fefce8; border: 1.5px solid #fef08a; font-family: 'Inter', sans-serif; }
+.tech-tamper-header { font-weight: 700; font-size: 13px; color: #854d0e; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.tech-tamper-desc { font-size: 12px; color: #a16207; margin-bottom: 10px; line-height: 1.4; }
+.tech-tamper-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.tamper-btn { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.tamper-btn:hover { background: #fee2e2; }
+.restore-btn { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.restore-btn:hover { background: #d1fae5; }
+.tamper-alert { background: #fef2f2; border: 1.5px solid #f87171; border-radius: 14px; padding: 18px; margin-top: 20px; }
+.tamper-alert-title { color: #b91c1c; font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.tamper-alert-desc { color: #991b1b; font-size: 13px; line-height: 1.5; margin: 0; }
 .vault-sub { color: var(--muted); font-size: 14px; font-weight: 500; }
 .how-sub { color: var(--muted); font-size: 14px; }
 .digilocker-hr { border: 0; border-top: 1px solid #e2e8f0; margin: 12px 0; }

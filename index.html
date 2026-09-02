@@ -270,8 +270,37 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
             <div class="tech-panel-content">
-              <div class="tech-note">Signed by Ration Portal · Tamper-proof · Expires in 90 days.</div>
-              <span id="jwtToken" class="jwt-token"></span>
+              <div class="tech-note">Signed and verified using the Web Crypto API (ECDSA P-256) — real cryptography running in your browser. In production, signing would happen server-side via HSM/KMS.</div>
+              <div class="tech-item">
+                <div class="tech-label">Issuing Authority Public Key (ECDSA P-256 · SPKI Base64):</div>
+                <code id="publicKeyDisplay" class="tech-code">Generating keypair...</code>
+              </div>
+              <div class="tech-item">
+                <div class="tech-label">Cryptographic Signature Bytes (ECDSA P-256 · Hex):</div>
+                <code id="signatureDisplay" class="tech-code">Awaiting document verification...</code>
+              </div>
+              <div class="tech-item">
+                <div class="tech-label">Credential Payload (Signed Claims):</div>
+                <code id="payloadDisplay" class="tech-code">Awaiting verification...</code>
+              </div>
+              <div class="tech-item">
+                <div class="tech-label">Signed Proof Token (Compact JWT):</div>
+                <span id="jwtToken" class="jwt-token"></span>
+              </div>
+              <div class="tech-tamper-box">
+                <div class="tech-tamper-header">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                  Tamper Detection Demonstration
+                </div>
+                <div class="tech-tamper-desc">
+                  Simulate an attacker editing the citizen ID or payload in localStorage. Because ECDSA signatures are cryptographically bound to the data, any alteration causes <code>crypto.subtle.verify()</code> to genuinely fail across consuming portals.
+                </div>
+                <div class="tech-tamper-actions">
+                  <button type="button" class="tamper-btn" id="tamperProofBtn">Simulate Tampering (Corrupt Proof)</button>
+                  <button type="button" class="restore-btn" id="restoreProofBtn">Restore Valid Proof</button>
+                  <span id="tamperStatus" class="tech-badge tech-badge-success">Status: Signature Valid</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
